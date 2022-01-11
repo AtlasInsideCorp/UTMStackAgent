@@ -9,7 +9,7 @@ func autoStart() error {
 	}
 	switch runtime.GOOS {
 	case "windows":
-		_, err := execute("nssm.exe", path, "install", "utmagent", "utmagent.exe")
+		_, err := execute("nssm.exe", path, "install", "utmagent", "utmagent.exe", "run")
 		if err != nil {
 			return err
 		}
