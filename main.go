@@ -82,7 +82,7 @@ func main() {
 		if err != nil {
 			h.FatalError("can't decode agent details: %v", err)
 		}
-		cnf := config{Server: ip, AgentKey: agentDetails.Key}
+		cnf := config{Server: ip, AgentID: agentDetails.ID, AgentKey: agentDetails.Key}
 		writeConfig(cnf)
 		configureBeat(ip)
 		configureWazuh(ip, cnf.AgentKey)

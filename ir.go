@@ -37,6 +37,7 @@ func incidentResponse() {
 					strconv.Itoa(AGENTMANAGERPORT)+
 					GETCOMMANDSENDPOINT+
 					fmt.Sprintf("?agentName=%s", serverName),
+				cnf.AgentID,
 				cnf.AgentKey,
 			)
 			var commands []struct {
@@ -50,13 +51,15 @@ func incidentResponse() {
 
 			for _, c := range commands {
 				response, _ := execute(c.command, path)
-				commandResponse(AGENTMANAGERPROTO+
-					"://"+
-					cnf.Server+
-					":"+
-					strconv.Itoa(AGENTMANAGERPORT)+
-					COMMANDSRESPONSEENDPOINT+
-					fmt.Sprintf("?agentName=%s", serverName),
+				commandResponse(
+					AGENTMANAGERPROTO+
+						"://"+
+						cnf.Server+
+						":"+
+						strconv.Itoa(AGENTMANAGERPORT)+
+						COMMANDSRESPONSEENDPOINT+
+						fmt.Sprintf("?agentName=%s", serverName),
+					cnf.AgentID,
 					cnf.AgentKey,
 					c.id,
 					response,
@@ -69,9 +72,10 @@ func incidentResponse() {
 	}()
 }
 
-func getCommands(endPoint string, key string) ([]byte, error) {
+func getCommands(endPoint, agentiId, key string) ([]byte, error) {
 	var err error
 	if req, err := http.NewRequest("GET", endPoint, nil); err == nil {
+		req.Header.Add("Agent-Id", agentiId)
 		req.Header.Add("Agent-Key", key)
 		if res, err := http.DefaultClient.Do(req); err == nil {
 			defer res.Body.Close()
@@ -83,11 +87,12 @@ func getCommands(endPoint string, key string) ([]byte, error) {
 	return nil, err
 }
 
-func commandResponse(endPoint string, key string, id int64, response string) error {
+func commandResponse(endPoint, agentiId, key string, id int64, response string) error {
 	var err error
 	payload := strings.NewReader(fmt.Sprintf("{\n\"id\": %d,\n\"response\": \"%s\"\n}", id, response))
 	if req, err := http.NewRequest("POST", endPoint, payload); err == nil {
 		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("Agent-Id", agentiId)
 		req.Header.Add("Agent-Key", key)
 		if res, err := http.DefaultClient.Do(req); err == nil {
 			defer res.Body.Close()

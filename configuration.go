@@ -26,6 +26,7 @@ func registerAgent(endPoint, name string, key string) ([]byte, error) {
 
 type config struct {
 	Server   string `yaml:"server"`
+	AgentID  string `yaml:"AgentID"`
 	AgentKey string `yaml:"agent-key"`
 }
 
