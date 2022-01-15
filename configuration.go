@@ -45,9 +45,10 @@ func getConfig() config {
 	return cnf
 }
 
-func writeConfig(cnf config) {
+func writeConfig(cnf config) error {
 	err := writeYAML("config.yml", cnf)
 	if err != nil {
-		h.FatalError("error writing config %v", err)
+		return err
 	}
+	return nil
 }
