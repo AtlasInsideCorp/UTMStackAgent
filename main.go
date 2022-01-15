@@ -33,6 +33,11 @@ func main() {
 	if len(os.Args) > 1 {
 		arg := os.Args[1]
 		switch arg {
+		case "uninstall":
+			err := uninstall()
+			if err != nil {
+				h.FatalError("can't remove agent dependencies or configurations: %v", err)
+			}
 		case "run":
 			incidentResponse()
 			startBeat()
@@ -83,9 +88,18 @@ func main() {
 			h.FatalError("can't decode agent details: %v", err)
 		}
 		cnf := config{Server: ip, AgentID: agentDetails.ID, AgentKey: agentDetails.Key}
-		writeConfig(cnf)
-		configureBeat(ip)
-		configureWazuh(ip, cnf.AgentKey)
+		err = writeConfig(cnf)
+		if err != nil {
+			h.FatalError("can't write agent config: %v", err)
+		}
+		err = configureBeat(ip)
+		if err != nil {
+			h.FatalError("can't configure beat: %v", err)
+		}
+		err = configureWazuh(ip, cnf.AgentKey)
+		if err != nil {
+			h.FatalError("can't configure wazuh: %v", err)
+		}
 		err = autoStart()
 		if err != nil {
 			h.FatalError("can't configure agent service: %v", err)
