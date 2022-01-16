@@ -15,9 +15,9 @@ import (
 )
 
 const (
-	TLSSKIPVERIFICATION      = false
-	AGENTMANAGERPROTO        = "http"
-	AGENTMANAGERPORT         = 8080
+	TLSSKIPVERIFICATION      = true
+	AGENTMANAGERPROTO        = "https"
+	AGENTMANAGERPORT         = 9000
 	REGISTRATIONENDPOINT     = "/api/v1/agent"
 	GETCOMMANDSENDPOINT      = "/api/v1/agent-by-name"
 	COMMANDSRESPONSEENDPOINT = "/api/v1/agent-by-name"
