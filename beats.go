@@ -70,9 +70,8 @@ func configureBeat(ip string) error {
 			if err != nil {
 				return err
 			}
-
 		case "rhel":
-			_, err := execute("yum", filepath.Join(path, "beats"), "install", "-y", "filebeat-oss-*-x86_64.rpm")
+			_, err := execute("yum", filepath.Join(path, "beats"), "localinstall", "-y", "filebeat-oss-*-x86_64.rpm")
 			if err != nil {
 				return err
 			}
@@ -83,10 +82,17 @@ func configureBeat(ip string) error {
 			if err != nil {
 				return err
 			}
-			_, err := execute("systemctl", filepath.Join(path, "beats"), "enable", "filebeat")
+
+			_, err := execute("filebeat", filepath.Join(path, "beats"), "modules", "enable", "system")
 			if err != nil {
 				return err
 			}
+
+			_, err = execute("systemctl", filepath.Join(path, "beats"), "enable", "filebeat")
+			if err != nil {
+				return err
+			}
+
 			_, err = execute("systemctl", filepath.Join(path, "beats"), "restart", "filebeat")
 			if err != nil {
 				return err
