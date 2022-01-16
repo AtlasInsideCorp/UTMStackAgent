@@ -8,16 +8,6 @@ import (
 	"strings"
 )
 
-func multiDownload(files []string, server string) error {
-	for _, f := range files {
-		err := download(server + f)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func download(f string) error {
 	var fileName string
 
