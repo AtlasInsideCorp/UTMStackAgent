@@ -188,17 +188,17 @@
   # ------------------------------ Logstash Output -------------------------------
   output.logstash:
 	  # The Logstash hosts
-	  hosts: ["{{.IP}}:5044"]
+	  hosts: ["{{ .IP }}:5044"]
 	
 	  # Optional SSL. By default is off.
 	  # List of root certificates for HTTPS server verifications
-	  ssl.certificate_authorities: ["{{.CA}}"]
+	  ssl.certificate_authorities: ["{{ .CA }}"]
 	
 	  # Certificate for SSL client authentication
-	  ssl.certificate: "{{.ClientCert}}"
+	  ssl.certificate: "{{ .ClientCert }}"
 	
 	  # Client Certificate Key
-	  ssl.key: "{{.ClientKey}}"
+	  ssl.key: "{{ .ClientKey }}"
 	
 	  # No validate certificates
 	  ssl.verification_mode: none
