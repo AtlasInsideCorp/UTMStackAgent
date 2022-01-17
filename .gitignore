@@ -1,5 +1,5 @@
 keys/*
 beats/*
 wazuh/*
-nssm.exe
+*.exe
 dist/*
