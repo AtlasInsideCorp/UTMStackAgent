@@ -19,8 +19,8 @@ const (
 	AGENTMANAGERPROTO        = "https"
 	AGENTMANAGERPORT         = 9000
 	REGISTRATIONENDPOINT     = "/api/v1/agent"
-	GETCOMMANDSENDPOINT      = "/api/v1/agent-by-name"
-	COMMANDSRESPONSEENDPOINT = "/api/v1/agent-by-name"
+	GETCOMMANDSENDPOINT      = "/api/v1/incident-commands"
+	COMMANDSRESPONSEENDPOINT = "/api/v1/incident-command/result"
 	TLSCA                    = "ca.crt"
 	TLSCRT                   = "client.crt"
 	TLSKEY                   = "client.key"
@@ -105,5 +105,7 @@ func main() {
 		if err != nil {
 			h.FatalError("can't configure agent service: %v", err)
 		}
+
+		os.Exit(0)
 	}
 }
