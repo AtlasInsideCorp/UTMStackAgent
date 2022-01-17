@@ -50,7 +50,7 @@ func configureWazuh(ip, key string) error {
 	switch runtime.GOOS {
 	case "windows":
 		ossecFile := filepath.Join(path, "wazuh", "windows", "ossec.conf")
-		ossecTemplateFile := filepath.Join(path, "templates", "wazuh-windows.template")
+		ossecTemplateFile := filepath.Join(path, "templates", "wazuh-windows.conf")
 
 		err := generateFromTemplate(config, ossecTemplateFile, ossecFile)
 		if err != nil {
@@ -72,7 +72,7 @@ func configureWazuh(ip, key string) error {
 
 		switch family {
 		case "debian":
-			templateFile = filepath.Join(path, "templates", "wazuh-debian.template")
+			templateFile = filepath.Join(path, "templates", "wazuh-debian.conf")
 
 			_, err := execute("apt", filepath.Join(path, "wazuh"), "update")
 			if err != nil {
@@ -110,7 +110,7 @@ func configureWazuh(ip, key string) error {
 			}
 
 		case "rhel":
-			templateFile = filepath.Join(path, "templates", "wazuh-rhel.template")
+			templateFile = filepath.Join(path, "templates", "wazuh-rhel.conf")
 
 			_, err := execute("rpm", filepath.Join(path, "wazuh"), "--import", "https://packages.wazuh.com/key/GPG-KEY-WAZUH")
 			if err != nil {
