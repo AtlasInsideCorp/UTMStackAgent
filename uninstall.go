@@ -17,7 +17,7 @@ func uninstall() error {
 			return err
 		}
 
-		_, err = execute("nssm.exe", path, "remove", "utmstack")
+		_, err = execute("nssm.exe", path, "remove", "utmstack", "confirm")
 		if err != nil {
 			return err
 		}
