@@ -50,14 +50,14 @@ func configureBeat(ip string) error {
 	switch runtime.GOOS {
 	case "windows":
 		configFile := filepath.Join(path, "beats", "windows", "winlogbeat", "winlogbeat.yml")
-		templateFile := filepath.Join(path, "templates", "winlogbeat.template")
+		templateFile := filepath.Join(path, "templates", "winlogbeat.yml")
 		err := generateFromTemplate(config, templateFile, configFile)
 		if err != nil {
 			return err
 		}
 	case "linux":
 		configFile := filepath.Join("/", "etc", "filebeat", "filebeat.yml")
-		templateFile := filepath.Join(path, "templates", "filebeat-linux.template")
+		templateFile := filepath.Join(path, "templates", "filebeat-linux.yml")
 
 		family, err := detectLinuxFamily()
 		if err != nil {
