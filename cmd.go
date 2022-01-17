@@ -5,10 +5,14 @@ import (
 )
 
 func execute(c string, dir string, arg ...string) (string, error) {
-	var err error
-	if out, err := exec.Command(c, arg...).Output(); err == nil {
-		output := string(out[:])
-		return output, nil
+	cmd := exec.Command(c, arg...)
+	cmd.Dir = dir
+	out, err := cmd.Output()
+	if err != nil {
+		h.Debug("Command message: %s", string(out[:]))
+		h.Debug("Command error: %s", err)
+		return "", err
 	}
-	return "", err
+
+	return string(out[:]), nil
 }
