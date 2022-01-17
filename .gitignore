@@ -2,4 +2,6 @@ keys/*
 beats/*
 wazuh/*
 *.exe
+*.msi
 dist/*
+Program Files 64/*
