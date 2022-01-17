@@ -87,6 +87,7 @@ func main() {
 		if err != nil {
 			h.FatalError("can't decode agent details: %v", err)
 		}
+		h.Debug("Agent Details: %v", agentDetails)
 		cnf := config{Server: ip, AgentID: agentDetails.ID, AgentKey: agentDetails.Key}
 		err = writeConfig(cnf)
 		if err != nil {

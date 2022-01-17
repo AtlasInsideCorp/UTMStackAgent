@@ -10,7 +10,7 @@ import (
 
 func registerAgent(endPoint, name string, key string) ([]byte, error) {
 	var err error
-	payload := strings.NewReader(fmt.Sprintf("{\n\"agentName\": \"%s\",\n\"ip\": \"0.0.0.0/0\"\n}", name))
+	payload := strings.NewReader(fmt.Sprintf("{\n\"agentName\": \"%s\"\n}", name))
 	if req, err := http.NewRequest("POST", endPoint, payload); err == nil {
 		req.Header.Add("Content-Type", "application/json")
 		req.Header.Add("UTM-Token", key)
