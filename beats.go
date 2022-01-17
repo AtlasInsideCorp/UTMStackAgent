@@ -19,6 +19,9 @@ func startBeat() {
 				_, err = execute(
 					filepath.Join(path, "beats", "windows", "winlogbeat", "winlogbeat.exe"),
 					filepath.Join(path, "beats", "windows", "winlogbeat"),
+					"--strict.perms=false",
+					"-c",
+					"winlogbeat.yml",
 				)
 				if err != nil {
 					h.FatalError("error running winlogbeat: %v", err)
