@@ -58,7 +58,8 @@ func writeYAML(url string, data interface{}) error {
 }
 
 func generateFromTemplate(data interface{}, tfile string, cfile string) error {
-	ut, err := template.New("config").ParseFiles(tfile)
+	_, fileName := filepath.Split(tfile)
+	ut, err := template.New(fileName).ParseFiles(tfile)
 
 	if err != nil {
 		return err

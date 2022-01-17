@@ -52,7 +52,7 @@ func autoStart() error {
 		}
 
 		scriptFile := filepath.Join("/", "usr", "local", "bin", "utmstack-agent.sh")
-		scriptTemplateFile := filepath.Join(path, "templates", "utmstack-agent-bash.template")
+		scriptTemplateFile := filepath.Join(path, "templates", "utmstack-agent-bash.sh")
 
 		err := generateFromTemplate(bash{Path: path}, scriptTemplateFile, scriptFile)
 		if err != nil {
