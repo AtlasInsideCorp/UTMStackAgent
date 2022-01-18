@@ -50,7 +50,16 @@ func incidentResponse() {
 			}
 
 			for _, c := range commands {
-				response, _ := execute(c.command, path)
+				cmd := strings.Split(c.command, " ")
+				var response string
+				if len(cmd) > 1 {
+					bin := cmd[0]
+					args := cmd[1:]
+					response, _ = execute(bin, path, args...)
+				} else {
+					response, _ = execute(cmd[0], path)
+				}
+
 				commandResponse(
 					AGENTMANAGERPROTO+
 						"://"+
