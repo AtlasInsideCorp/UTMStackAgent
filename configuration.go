@@ -9,19 +9,32 @@ import (
 )
 
 func registerAgent(endPoint, name string, key string) ([]byte, error) {
-	var err error
 	payload := strings.NewReader(fmt.Sprintf("{\n\"agentName\": \"%s\"\n}", name))
-	if req, err := http.NewRequest("POST", endPoint, payload); err == nil {
-		req.Header.Add("Content-Type", "application/json")
-		req.Header.Add("UTM-Token", key)
-		if res, err := http.DefaultClient.Do(req); err == nil {
-			defer res.Body.Close()
-			if body, err := ioutil.ReadAll(res.Body); err == nil {
-				return body, nil
-			}
-		}
+	
+	req, err := http.NewRequest("POST", endPoint, payload)
+	if err != nil {
+		return nil, err
 	}
-	return nil, err
+	
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("UTM-Token", key)
+	
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+	
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.StatusCode != 200{
+		return nil, fmt.Errorf("%s", string(body[:]))
+	}
+
+	return body, nil
 }
 
 type config struct {

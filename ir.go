@@ -80,33 +80,58 @@ func incidentResponse() {
 }
 
 func getCommands(endPoint, agentId, key string) ([]byte, error) {
-	var err error
-	if req, err := http.NewRequest("GET", endPoint, nil); err == nil {
-		req.Header.Add("Agent-Id", agentId)
-		req.Header.Add("Agent-Key", key)
-		if res, err := http.DefaultClient.Do(req); err == nil {
-			defer res.Body.Close()
-			if body, err := ioutil.ReadAll(res.Body); err == nil {
-				return body, nil
-			}
-		}
+	req, err := http.NewRequest("GET", endPoint, nil)
+	if err != nil {
+		return nil, err
 	}
-	return nil, err
+
+	req.Header.Add("Agent-Id", agentId)
+	req.Header.Add("Agent-Key", key)
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.StatusCode != 200 {
+		return nil, fmt.Errorf("%s", string(body[:]))
+	}
+
+	return body, nil
 }
 
 func commandResponse(endPoint, agentId, key string, id int64, response string) error {
-	var err error
 	payload := strings.NewReader(fmt.Sprintf("{\n\"jobId\": %d,\n\"result\": \"%s\"\n}", id, response))
-	if req, err := http.NewRequest("POST", endPoint, payload); err == nil {
-		req.Header.Add("Content-Type", "application/json")
-		req.Header.Add("Agent-Id", agentId)
-		req.Header.Add("Agent-Key", key)
-		if res, err := http.DefaultClient.Do(req); err == nil {
-			defer res.Body.Close()
-			if _, err := ioutil.ReadAll(res.Body); err == nil {
-				return nil
-			}
-		}
+
+	req, err := http.NewRequest("POST", endPoint, payload)
+	if err != nil {
+		return err
 	}
-	return err
+
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Agent-Id", agentId)
+	req.Header.Add("Agent-Key", key)
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+
+	if res.StatusCode != 200 {
+		return fmt.Errorf("%s", string(body[:]))
+	}
+
+	return nil
 }
