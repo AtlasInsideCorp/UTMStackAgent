@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"path/filepath"
 	"runtime"
 	"sync"
@@ -16,15 +17,15 @@ func startBeat() {
 		switch runtime.GOOS {
 		case "windows":
 			runOnce.Do(func() {
-				_, err = execute(
+				result, err := execute(
 					filepath.Join(path, "beats", "windows", "winlogbeat", "winlogbeat.exe"),
 					filepath.Join(path, "beats", "windows", "winlogbeat"),
 					"--strict.perms=false",
 					"-c",
 					"winlogbeat.yml",
 				)
-				if err != nil {
-					h.FatalError("error running winlogbeat: %v", err)
+				if err {
+					h.FatalError("error running winlogbeat: %s", result)
 				}
 			})
 		}
@@ -69,14 +70,14 @@ func configureBeat(ip string) error {
 
 		switch family {
 		case "debian":
-			_, err := execute("dpkg", filepath.Join(path, "beats"), "-i", "filebeat-oss-*-amd64.deb")
-			if err != nil {
-				return err
+			result, err := execute("dpkg", filepath.Join(path, "beats"), "-i", "filebeat-oss-*-amd64.deb")
+			if err {
+				return fmt.Errorf("%s", result)
 			}
 		case "rhel":
-			_, err := execute("yum", filepath.Join(path, "beats"), "localinstall", "-y", "filebeat-oss-*-x86_64.rpm")
-			if err != nil {
-				return err
+			result, err := execute("yum", filepath.Join(path, "beats"), "localinstall", "-y", "filebeat-oss-*-x86_64.rpm")
+			if err {
+				return fmt.Errorf("%s", result)
 			}
 		}
 
@@ -86,19 +87,19 @@ func configureBeat(ip string) error {
 				return err
 			}
 
-			_, err := execute("filebeat", filepath.Join(path, "beats"), "modules", "enable", "system")
-			if err != nil {
-				return err
+			result, err := execute("filebeat", filepath.Join(path, "beats"), "modules", "enable", "system")
+			if err {
+				return fmt.Errorf("%s", result)
 			}
 
-			_, err = execute("systemctl", filepath.Join(path, "beats"), "enable", "filebeat")
-			if err != nil {
-				return err
+			result, err = execute("systemctl", filepath.Join(path, "beats"), "enable", "filebeat")
+			if err {
+				return fmt.Errorf("%s", result)
 			}
 
-			_, err = execute("systemctl", filepath.Join(path, "beats"), "restart", "filebeat")
-			if err != nil {
-				return err
+			result, err = execute("systemctl", filepath.Join(path, "beats"), "restart", "filebeat")
+			if err {
+				return fmt.Errorf("%s", result)
 			}
 		}
 	}

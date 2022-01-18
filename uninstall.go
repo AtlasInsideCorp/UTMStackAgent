@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"path/filepath"
 	"runtime"
 )
@@ -12,34 +13,34 @@ func uninstall() error {
 	}
 	switch runtime.GOOS {
 	case "windows":
-		_, err := execute("nssm.exe", path, "stop", "utmstack")
-		if err != nil {
-			return err
+		result, err := execute("nssm.exe", path, "stop", "utmstack")
+		if err{
+			return fmt.Errorf("%s", result)
 		}
 
-		_, err = execute("nssm.exe", path, "remove", "utmstack", "confirm")
-		if err != nil {
-			return err
+		result, err = execute("nssm.exe", path, "remove", "utmstack", "confirm")
+		if err{
+			return fmt.Errorf("%s", result)
 		}
 	case "linux":
-		_, err = execute("systemctl", path, "disable", "utmstack")
-		if err != nil {
-			return err
+		result, err := execute("systemctl", path, "disable", "utmstack")
+		if err{
+			return fmt.Errorf("%s", result)
 		}
 
-		_, err = execute("systemctl", path, "stop", "utmstack")
-		if err != nil {
-			return err
+		result, err = execute("systemctl", path, "stop", "utmstack")
+		if err{
+			return fmt.Errorf("%s", result)
 		}
 
-		_, err = execute("rm", path, filepath.Join("/", "etc", "systemd", "system", "utmstack.service"))
-		if err != nil {
-			return err
+		result, err = execute("rm", path, filepath.Join("/", "etc", "systemd", "system", "utmstack.service"))
+		if err{
+			return fmt.Errorf("%s", result)
 		}
 
-		_, err = execute("systemctl", path, "daemon-reload")
-		if err != nil {
-			return err
+		result, err = execute("systemctl", path, "daemon-reload")
+		if err{
+			return fmt.Errorf("%s", result)
 		}
 	}
 	return nil

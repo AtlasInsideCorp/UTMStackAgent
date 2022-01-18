@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"path/filepath"
 	"runtime"
 )
@@ -12,39 +13,39 @@ func autoStart() error {
 	}
 	switch runtime.GOOS {
 	case "windows":
-		_, err := execute("nssm.exe", path, "install", "utmstack", "utmstack-windows.exe", "run")
-		if err != nil {
-			return err
+		result, err := execute("nssm.exe", path, "install", "utmstack", "utmstack-windows.exe", "run")
+		if err {
+			return fmt.Errorf("%s", result)
 		}
 
-		execute("nssm.exe", path, "set", "utmstack", "AppDirectory", path)
-		if err != nil {
-			return err
+		result, err = execute("nssm.exe", path, "set", "utmstack", "AppDirectory", path)
+		if err {
+			return fmt.Errorf("%s", result)
 		}
 
-		execute("nssm.exe", path, "set", "utmstack", "DisplayName", "UTMStack Agent")
-		if err != nil {
-			return err
+		result, err = execute("nssm.exe", path, "set", "utmstack", "DisplayName", "UTMStack Agent")
+		if err {
+			return fmt.Errorf("%s", result)
 		}
 
-		execute("nssm.exe", path, "set", "utmstack", "AppExit", "Default", "Restart")
-		if err != nil {
-			return err
+		result, err = execute("nssm.exe", path, "set", "utmstack", "AppExit", "Default", "Restart")
+		if err {
+			return fmt.Errorf("%s", result)
 		}
 
-		execute("nssm.exe", path, "set", "utmstack", "Start", "SERVICE_AUTO_START")
-		if err != nil {
-			return err
+		result, err = execute("nssm.exe", path, "set", "utmstack", "Start", "SERVICE_AUTO_START")
+		if err {
+			return fmt.Errorf("%s", result)
 		}
 
-		execute("nssm.exe", path, "set", "utmstack", "ObjectName", "LocalSystem")
-		if err != nil {
-			return err
+		result, err = execute("nssm.exe", path, "set", "utmstack", "ObjectName", "LocalSystem")
+		if err {
+			return fmt.Errorf("%s", result)
 		}
 
-		execute("nssm.exe", path, "start", "utmstack")
-		if err != nil {
-			return err
+		result, err = execute("nssm.exe", path, "start", "utmstack")
+		if err {
+			return fmt.Errorf("%s", result)
 		}
 	case "linux":
 		type bash struct {
@@ -59,9 +60,9 @@ func autoStart() error {
 			return err
 		}
 
-		_, err = execute("chmod", path, "755", filepath.Join("/", "usr", "local", "bin", "utmstack-agent.sh"))
-		if err != nil {
-			return err
+		result, errB := execute("chmod", path, "755", filepath.Join("/", "usr", "local", "bin", "utmstack-agent.sh"))
+		if errB {
+			return fmt.Errorf("%s", result)
 		}
 
 		incidentServiceConfig := `[Unit]
@@ -81,14 +82,14 @@ WantedBy=multi-user.target`
 			return err
 		}
 
-		_, err = execute("systemctl", filepath.Join(path, "beats"), "enable", "utmstack")
-		if err != nil {
-			return err
+		result, errB = execute("systemctl", filepath.Join(path, "beats"), "enable", "utmstack")
+		if errB {
+			return fmt.Errorf("%s", result)
 		}
 
-		_, err = execute("systemctl", filepath.Join(path, "beats"), "restart", "utmstack")
-		if err != nil {
-			return err
+		result, errB = execute("systemctl", filepath.Join(path, "beats"), "restart", "utmstack")
+		if errB {
+			return fmt.Errorf("%s", result)
 		}
 	}
 	return nil

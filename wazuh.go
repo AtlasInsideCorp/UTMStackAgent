@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/base64"
+	"fmt"
 	"path/filepath"
 	"runtime"
 	"sync"
@@ -17,13 +18,13 @@ func startWazuh() {
 		switch runtime.GOOS {
 		case "windows":
 			runOnce.Do(func() {
-				_, err = execute(
+				result, errB := execute(
 					filepath.Join(path, "wazuh", "windows", "wazuh-agent.exe"),
 					filepath.Join(path, "wazuh", "windows"),
 					"start",
 				)
-				if err != nil {
-					h.FatalError("error running wazuh: %v", err)
+				if errB {
+					h.FatalError("error running wazuh: %s", result)
 				}
 			})
 		}
@@ -74,24 +75,24 @@ func configureWazuh(ip, key string) error {
 		case "debian":
 			templateFile = filepath.Join(path, "templates", "wazuh-debian.conf")
 
-			_, err := execute("apt", filepath.Join(path, "wazuh"), "update")
+			result, errB := execute("apt", filepath.Join(path, "wazuh"), "update")
+			if errB {
+				return fmt.Errorf("%s", result)
+			}
+
+			result, errB = execute("apt", filepath.Join(path, "wazuh"), "install", "-y", "curl", "apt-transport-https", "lsb-release", "gnupg2", "wget")
+			if errB {
+				return fmt.Errorf("%s", result)
+			}
+
+			err := download("https://packages.wazuh.com/key/GPG-KEY-WAZUH")
 			if err != nil {
 				return err
 			}
 
-			_, err = execute("apt", filepath.Join(path, "wazuh"), "install", "-y", "curl", "apt-transport-https", "lsb-release", "gnupg2", "wget")
-			if err != nil {
-				return err
-			}
-
-			err = download("https://packages.wazuh.com/key/GPG-KEY-WAZUH")
-			if err != nil {
-				return err
-			}
-
-			_, err = execute("apt-key", path, "add", "GPG-KEY-WAZUH")
-			if err != nil {
-				return err
+			result, errB = execute("apt-key", path, "add", "GPG-KEY-WAZUH")
+			if errB {
+				return fmt.Errorf("%s", result)
 			}
 
 			err = writeToFile(filepath.Join("/", "etc", "apt", "sources.list.d", "wazuh.list"), "deb https://packages.wazuh.com/4.x/apt/ stable main")
@@ -99,22 +100,22 @@ func configureWazuh(ip, key string) error {
 				return err
 			}
 
-			_, err = execute("apt", filepath.Join(path, "wazuh"), "update")
-			if err != nil {
-				return err
+			result, errB = execute("apt", filepath.Join(path, "wazuh"), "update")
+			if errB {
+				return fmt.Errorf("%s", result)
 			}
 
-			_, err = execute("apt", filepath.Join(path, "wazuh"), "install", "-y", "wazuh-agent")
-			if err != nil {
-				return err
+			result, errB = execute("apt", filepath.Join(path, "wazuh"), "install", "-y", "wazuh-agent")
+			if errB {
+				return fmt.Errorf("%s", result)
 			}
 
 		case "rhel":
 			templateFile = filepath.Join(path, "templates", "wazuh-rhel.conf")
 
-			_, err := execute("rpm", filepath.Join(path, "wazuh"), "--import", "https://packages.wazuh.com/key/GPG-KEY-WAZUH")
-			if err != nil {
-				return err
+			result, errB := execute("rpm", filepath.Join(path, "wazuh"), "--import", "https://packages.wazuh.com/key/GPG-KEY-WAZUH")
+			if errB {
+				return fmt.Errorf("%s", result)
 			}
 
 			err = writeToFile(
@@ -131,9 +132,9 @@ protect=1`,
 				return err
 			}
 
-			_, err = execute("yum", filepath.Join(path, "wazuh"), "install", "-y", "wazuh-agent")
-			if err != nil {
-				return err
+			result, errB = execute("yum", filepath.Join(path, "wazuh"), "install", "-y", "wazuh-agent")
+			if errB {
+				return fmt.Errorf("%s", result)
 			}
 		}
 
@@ -148,14 +149,14 @@ protect=1`,
 				return err
 			}
 
-			_, err := execute("systemctl", filepath.Join(path, "beats"), "enable", "wazuh-agent")
-			if err != nil {
-				return err
+			result, errB := execute("systemctl", filepath.Join(path, "beats"), "enable", "wazuh-agent")
+			if errB {
+				return fmt.Errorf("%s", result)
 			}
 
-			_, err = execute("systemctl", filepath.Join(path, "beats"), "restart", "wazuh-agent")
-			if err != nil {
-				return err
+			result, errB = execute("systemctl", filepath.Join(path, "beats"), "restart", "wazuh-agent")
+			if errB {
+				return fmt.Errorf("%s", result)
 			}
 		}
 	}

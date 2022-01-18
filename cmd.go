@@ -4,15 +4,13 @@ import (
 	"os/exec"
 )
 
-func execute(c string, dir string, arg ...string) (string, error) {
+func execute(c string, dir string, arg ...string) (string, bool) {
 	cmd := exec.Command(c, arg...)
 	cmd.Dir = dir
 	out, err := cmd.Output()
 	if err != nil {
-		h.Debug("Command message: %s", string(out[:]))
-		h.Debug("Command error: %s", err)
-		return "", err
+		return string(out[:]) + err.Error(), true
 	}
 
-	return string(out[:]), nil
+	return string(out[:]), false
 }

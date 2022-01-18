@@ -53,9 +53,7 @@ func incidentResponse() {
 				cmd := strings.Split(c.command, " ")
 				var response string
 				if len(cmd) > 1 {
-					bin := cmd[0]
-					args := cmd[1:]
-					response, _ = execute(bin, path, args...)
+					response, _ = execute(cmd[0], path, cmd[1:]...)
 				} else {
 					response, _ = execute(cmd[0], path)
 				}
@@ -76,7 +74,7 @@ func incidentResponse() {
 			}
 
 			IRMutex.Unlock()
-			time.Sleep(10 * time.Second)
+			time.Sleep(1 * time.Second)
 		}
 	}()
 }
