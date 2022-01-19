@@ -31,6 +31,29 @@ func startWazuh() {
 	}()
 }
 
+func stopWazuh() {
+	var runOnce sync.Once
+	go func() {
+		path, err := getMyPath()
+		if err != nil {
+			h.FatalError("error getting path: %v", err)
+		}
+		switch runtime.GOOS {
+		case "windows":
+			runOnce.Do(func() {
+				result, errB := execute(
+					filepath.Join(path, "wazuh", "windows", "wazuh-agent.exe"),
+					filepath.Join(path, "wazuh", "windows"),
+					"stop",
+				)
+				if errB {
+					h.FatalError("error stopping wazuh: %s", result)
+				}
+			})
+		}
+	}()
+}
+
 func configureWazuh(ip, key string) error {
 	path, err := getMyPath()
 	if err != nil {
