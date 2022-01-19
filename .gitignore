@@ -5,3 +5,4 @@ wazuh/*
 *.msi
 dist/*
 Program Files 64/*
+config.yml
