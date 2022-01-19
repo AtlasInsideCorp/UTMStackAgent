@@ -49,7 +49,7 @@ func main() {
 			fmt.Println("unknown option")
 		}
 	} else {
-		if _, err := os.ReadFile(); err != nil {
+		if _, err := os.ReadFile("config.yml"); err != nil {
 
 			var ip string
 			var utmKey string
