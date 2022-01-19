@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -8,33 +9,68 @@ import (
 	"sync"
 )
 
-func registerAgent(endPoint, name string, key string) ([]byte, error) {
+func registerAgent(endPoint, name string, key string) (agentDetails, error) {
+	var body []byte
 	payload := strings.NewReader(fmt.Sprintf("{\n\"agentName\": \"%s\"\n}", name))
-	
-	req, err := http.NewRequest("POST", endPoint, payload)
+
+	regReq, err := http.NewRequest("POST", endPoint+REGISTRATIONENDPOINT, payload)
 	if err != nil {
-		return nil, err
-	}
-	
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("UTM-Token", key)
-	
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-	
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
+		return agentDetails{}, err
 	}
 
-	if res.StatusCode != 200{
-		return nil, fmt.Errorf("%s", string(body[:]))
+	regReq.Header.Add("Content-Type", "application/json")
+	regReq.Header.Add("UTM-Token", key)
+
+	regRes, err := http.DefaultClient.Do(regReq)
+	if err != nil {
+		return agentDetails{}, err
+	}
+	defer regRes.Body.Close()
+
+	body, err = ioutil.ReadAll(regRes.Body)
+	if err != nil {
+		return agentDetails{}, err
 	}
 
-	return body, nil
+	if regRes.StatusCode != 200 {
+		keyReq, err := http.NewRequest("GET", endPoint+GETIDANDKEYENDPOINT+fmt.Sprintf("?agentName=%s", name), nil)
+		if err != nil {
+			return agentDetails{}, err
+		}
+
+		keyReq.Header.Add("UTM-Token", key)
+
+		keyRes, err := http.DefaultClient.Do(keyReq)
+		if err != nil {
+			return agentDetails{}, err
+		}
+		defer keyRes.Body.Close()
+
+		body, err = ioutil.ReadAll(keyRes.Body)
+		if err != nil {
+			return agentDetails{}, err
+		}
+
+		var agentList []agentDetails
+
+		err = json.Unmarshal(body, &agentList)
+		if err != nil {
+			h.FatalError("can't decode agent details: %v", err)
+		}
+		h.Debug("Agent Details: %v", agentList)
+
+		return agentList[0], nil
+	}
+
+	var agent agentDetails
+
+	err = json.Unmarshal(body, &agent)
+	if err != nil {
+		h.FatalError("can't decode agent details: %v", err)
+	}
+	h.Debug("Agent Details: %v", agent)
+
+	return agent, nil
 }
 
 type config struct {

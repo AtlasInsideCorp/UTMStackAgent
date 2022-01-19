@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/tls"
-	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
@@ -19,6 +18,7 @@ const (
 	AGENTMANAGERPROTO        = "https"
 	AGENTMANAGERPORT         = 9000
 	REGISTRATIONENDPOINT     = "/api/v1/agent"
+	GETIDANDKEYENDPOINT      = "/api/v1/agent-id-key-by-name"
 	GETCOMMANDSENDPOINT      = "/api/v1/incident-commands"
 	COMMANDSRESPONSEENDPOINT = "/api/v1/incident-command/result"
 	TLSCA                    = "ca.crt"
@@ -27,6 +27,11 @@ const (
 )
 
 var h = holmes.New("debug", "UTMStack")
+
+type agentDetails struct {
+	ID  string `json:"id"`
+	Key string `json:"key"`
+}
 
 func main() {
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: TLSSKIPVERIFICATION}
@@ -38,6 +43,8 @@ func main() {
 			if err != nil {
 				h.FatalError("can't remove agent dependencies or configurations: %v", err)
 			}
+			
+			os.Exit(0)
 		case "run":
 			incidentResponse()
 			startBeat()
@@ -51,56 +58,44 @@ func main() {
 	} else {
 		var ip string
 		var utmKey string
-		fmt.Println("Please insert the Master or Proxy IP")
+
+		fmt.Println("Manager IP or FQDN:")
 		if _, err := fmt.Scanln(&ip); err != nil {
-			h.FatalError("can't get Master or Proxy ip addr: %v", err)
+			h.FatalError("can't get the manager IP or FQDN: %v", err)
 		}
-		if net.ParseIP(ip) == nil {
-			h.FatalError("%v is not a valid IP", ip)
-		}
-		fmt.Println("Please insert the UTMStack Key")
+
+		fmt.Println("Registration Key:")
 		if _, err := fmt.Scanln(&utmKey); err != nil {
-			h.FatalError("can't get the UTMStack Key: %v", err)
+			h.FatalError("can't get the registration key: %v", err)
 		}
+
 		hostName, err := os.Hostname()
 		if err != nil {
 			h.FatalError("can't get the hostname: %v", err)
 		}
-		regReq, err := registerAgent(
-			AGENTMANAGERPROTO+
-				"://"+
-				ip+
-				":"+
-				strconv.Itoa(AGENTMANAGERPORT)+
-				REGISTRATIONENDPOINT,
-			hostName,
-			utmKey,
+
+		agent, err := registerAgent(AGENTMANAGERPROTO+"://"+ip+":"+strconv.Itoa(AGENTMANAGERPORT), hostName, utmKey,
 		)
 		if err != nil {
-			h.FatalError("can't register agent: %v", err)
+			h.FatalError("Can't register agent: %v", err)
 		}
-		var agentDetails struct {
-			ID  string `json:"id"`
-			Key string `json:"key"`
-		}
-		err = json.Unmarshal(regReq, &agentDetails)
-		if err != nil {
-			h.FatalError("can't decode agent details: %v", err)
-		}
-		h.Debug("Agent Details: %v", agentDetails)
-		cnf := config{Server: ip, AgentID: agentDetails.ID, AgentKey: agentDetails.Key}
+
+		cnf := config{Server: ip, AgentID: agent.ID, AgentKey: agent.Key}
 		err = writeConfig(cnf)
 		if err != nil {
 			h.FatalError("can't write agent config: %v", err)
 		}
+
 		err = configureBeat(ip)
 		if err != nil {
 			h.FatalError("can't configure beat: %v", err)
 		}
+
 		err = configureWazuh(ip, cnf.AgentKey)
 		if err != nil {
 			h.FatalError("can't configure wazuh: %v", err)
 		}
+
 		err = autoStart()
 		if err != nil {
 			h.FatalError("can't configure agent service: %v", err)
