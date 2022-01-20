@@ -18,10 +18,16 @@ func startWazuh() {
 		switch runtime.GOOS {
 		case "windows":
 			runOnce.Do(func() {
-				result, errB := execute(
+				execute(
 					filepath.Join(path, "wazuh", "windows", "wazuh-agent.exe"),
 					filepath.Join(path, "wazuh", "windows"),
+					"install-service",
+				)
+				result, errB := execute(
+					filepath.Join(path, "nssm.exe"),
+					path,
 					"start",
+					"WazuhSvc",
 				)
 				if errB {
 					h.FatalError("error running wazuh: %s", result)
@@ -33,25 +39,29 @@ func startWazuh() {
 
 func stopWazuh() {
 	var runOnce sync.Once
-	go func() {
-		path, err := getMyPath()
-		if err != nil {
-			h.FatalError("error getting path: %v", err)
-		}
-		switch runtime.GOOS {
-		case "windows":
-			runOnce.Do(func() {
-				result, errB := execute(
-					filepath.Join(path, "wazuh", "windows", "wazuh-agent.exe"),
-					filepath.Join(path, "wazuh", "windows"),
-					"stop",
-				)
-				if errB {
-					h.FatalError("error stopping wazuh: %s", result)
-				}
-			})
-		}
-	}()
+	path, err := getMyPath()
+	if err != nil {
+		h.FatalError("error getting path: %v", err)
+	}
+	switch runtime.GOOS {
+	case "windows":
+		runOnce.Do(func() {
+			result, errB := execute(
+				filepath.Join(path, "nssm.exe"),
+				path,
+				"stop",
+				"WazuhSvc",
+			)
+			if errB {
+				h.FatalError("error stopping wazuh: %s", result)
+			}
+			execute(
+				filepath.Join(path, "wazuh", "windows", "wazuh-agent.exe"),
+				filepath.Join(path, "wazuh", "windows"),
+				"uninstall-service",
+			)
+		})
+	}
 }
 
 func configureWazuh(ip, key string) error {

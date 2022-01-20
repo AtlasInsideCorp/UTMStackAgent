@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
 )
@@ -14,34 +15,37 @@ func uninstall() error {
 	switch runtime.GOOS {
 	case "windows":
 		result, err := execute("nssm.exe", path, "stop", "utmstack")
-		if err{
+		if err {
 			return fmt.Errorf("%s", result)
 		}
 
 		result, err = execute("nssm.exe", path, "remove", "utmstack", "confirm")
-		if err{
+		if err {
 			return fmt.Errorf("%s", result)
 		}
 	case "linux":
 		result, err := execute("systemctl", path, "disable", "utmstack")
-		if err{
+		if err {
 			return fmt.Errorf("%s", result)
 		}
 
 		result, err = execute("systemctl", path, "stop", "utmstack")
-		if err{
+		if err {
 			return fmt.Errorf("%s", result)
 		}
 
 		result, err = execute("rm", path, filepath.Join("/", "etc", "systemd", "system", "utmstack.service"))
-		if err{
+		if err {
 			return fmt.Errorf("%s", result)
 		}
 
 		result, err = execute("systemctl", path, "daemon-reload")
-		if err{
+		if err {
 			return fmt.Errorf("%s", result)
 		}
 	}
+
+	os.Remove(filepath.Join(path, "config.yml"))
+
 	return nil
 }
