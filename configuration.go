@@ -11,7 +11,7 @@ import (
 
 func registerAgent(endPoint, name string, key string) (agentDetails, error) {
 	var body []byte
-	payload := strings.NewReader(fmt.Sprintf("{\n\"agentName\": \"%s\"\n}", name))
+	payload := strings.NewReader(fmt.Sprintf(`{"agentName": "%s"}`, name))
 
 	regReq, err := http.NewRequest("POST", endPoint+REGISTRATIONENDPOINT, payload)
 	if err != nil {

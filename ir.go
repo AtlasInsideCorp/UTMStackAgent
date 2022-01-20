@@ -41,24 +41,26 @@ func incidentResponse() {
 				cnf.AgentKey,
 			)
 			var commands []struct {
-				id      int64
-				command string
+				ID      int64  `json:"id"`
+				Command string `json:"command"`
 			}
 
 			if err == nil {
 				json.Unmarshal(actions, &commands)
+			} else {
+				h.Error("Error getting commands: %v", err)
 			}
 
 			for _, c := range commands {
-				cmd := strings.Split(c.command, " ")
+				cmd := strings.Split(c.Command, " ")
 				var response string
+				h.Debug("Executing command: %v", cmd)
 				if len(cmd) > 1 {
 					response, _ = execute(cmd[0], path, cmd[1:]...)
 				} else {
 					response, _ = execute(cmd[0], path)
 				}
-
-				commandResponse(
+				err := commandResponse(
 					AGENTMANAGERPROTO+
 						"://"+
 						cnf.Server+
@@ -68,9 +70,12 @@ func incidentResponse() {
 						fmt.Sprintf("?agentName=%s", serverName),
 					cnf.AgentID,
 					cnf.AgentKey,
-					c.id,
+					c.ID,
 					response,
 				)
+				if err != nil {
+					h.Error("Error sending command response: %v", err)
+				}
 			}
 
 			IRMutex.Unlock()
@@ -107,8 +112,12 @@ func getCommands(endPoint, agentId, key string) ([]byte, error) {
 }
 
 func commandResponse(endPoint, agentId, key string, id int64, response string) error {
-	payload := strings.NewReader(fmt.Sprintf("{\n\"jobId\": %d,\n\"result\": \"%s\"\n}", id, response))
-
+	result, err := json.Marshal(jobResult{JobId:id, Result:response})
+	if err != nil{
+		return err
+	}
+	payload := strings.NewReader(string(result))
+	h.Debug("Command execution result: %s", string(result))
 	req, err := http.NewRequest("POST", endPoint, payload)
 	if err != nil {
 		return err

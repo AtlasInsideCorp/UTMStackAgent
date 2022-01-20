@@ -32,6 +32,11 @@ type agentDetails struct {
 	Key string `json:"key"`
 }
 
+type jobResult struct{
+	JobId  int64 `json:"jobId"`
+	Result string `json:"result"`
+}
+
 func main() {
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: TLSSKIPVERIFICATION}
 	if len(os.Args) > 1 {
