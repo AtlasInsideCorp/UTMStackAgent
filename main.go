@@ -1,9 +1,7 @@
 package main
 
 import (
-	"crypto/tls"
 	"fmt"
-	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
@@ -13,7 +11,6 @@ import (
 )
 
 const (
-	TLSSKIPVERIFICATION      = true
 	AGENTMANAGERPROTO        = "https"
 	AGENTMANAGERPORT         = 9000
 	REGISTRATIONENDPOINT     = "/api/v1/agent"
@@ -32,13 +29,12 @@ type agentDetails struct {
 	Key string `json:"key"`
 }
 
-type jobResult struct{
-	JobId  int64 `json:"jobId"`
+type jobResult struct {
+	JobId  int64  `json:"jobId"`
 	Result string `json:"result"`
 }
 
 func main() {
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: TLSSKIPVERIFICATION}
 	if len(os.Args) > 1 {
 		arg := os.Args[1]
 		switch arg {
@@ -58,6 +54,7 @@ func main() {
 
 			var ip string
 			var utmKey string
+			var skip string
 
 			fmt.Println("Manager IP or FQDN:")
 			if _, err := fmt.Scanln(&ip); err != nil {
@@ -69,17 +66,27 @@ func main() {
 				h.FatalError("can't get the registration key: %v", err)
 			}
 
+			fmt.Println("Skip certificate validation (yes or no):")
+			if _, err := fmt.Scanln(&skip); err != nil {
+				h.FatalError("can't get certificate validation response: %v", err)
+			}
+
 			hostName, err := os.Hostname()
 			if err != nil {
 				h.FatalError("can't get the hostname: %v", err)
 			}
 
-			agent, err := registerAgent(AGENTMANAGERPROTO+"://"+ip+":"+strconv.Itoa(AGENTMANAGERPORT), hostName, utmKey)
+			var insecure bool
+			if skip == "yes" {
+				insecure = true
+			}
+
+			agent, err := registerAgent(AGENTMANAGERPROTO+"://"+ip+":"+strconv.Itoa(AGENTMANAGERPORT), hostName, utmKey, insecure)
 			if err != nil {
 				h.FatalError("Can't register agent: %v", err)
 			}
 
-			cnf := config{Server: ip, AgentID: agent.ID, AgentKey: agent.Key}
+			cnf := config{Server: ip, AgentID: agent.ID, AgentKey: agent.Key, SkipCertValidation: insecure}
 			err = writeConfig(cnf)
 			if err != nil {
 				h.FatalError("can't write agent config: %v", err)

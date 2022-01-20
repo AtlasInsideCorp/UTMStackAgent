@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -39,6 +40,7 @@ func incidentResponse() {
 					fmt.Sprintf("?agentName=%s", serverName),
 				cnf.AgentID,
 				cnf.AgentKey,
+				cnf.SkipCertValidation,
 			)
 			var commands []struct {
 				ID      int64  `json:"id"`
@@ -72,6 +74,7 @@ func incidentResponse() {
 					cnf.AgentKey,
 					c.ID,
 					response,
+					cnf.SkipCertValidation,
 				)
 				if err != nil {
 					h.Error("Error sending command response: %v", err)
@@ -84,7 +87,8 @@ func incidentResponse() {
 	}()
 }
 
-func getCommands(endPoint, agentId, key string) ([]byte, error) {
+func getCommands(endPoint, agentId, key string, insecure bool) ([]byte, error) {
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: insecure}
 	req, err := http.NewRequest("GET", endPoint, nil)
 	if err != nil {
 		return nil, err
@@ -111,9 +115,10 @@ func getCommands(endPoint, agentId, key string) ([]byte, error) {
 	return body, nil
 }
 
-func commandResponse(endPoint, agentId, key string, id int64, response string) error {
-	result, err := json.Marshal(jobResult{JobId:id, Result:response})
-	if err != nil{
+func commandResponse(endPoint, agentId, key string, id int64, response string, insecure bool) error {
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: insecure}
+	result, err := json.Marshal(jobResult{JobId: id, Result: response})
+	if err != nil {
 		return err
 	}
 	payload := strings.NewReader(string(result))

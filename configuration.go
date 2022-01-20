@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -9,7 +10,8 @@ import (
 	"sync"
 )
 
-func registerAgent(endPoint, name string, key string) (agentDetails, error) {
+func registerAgent(endPoint, name string, key string, insecure bool) (agentDetails, error) {
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: insecure}
 	var body []byte
 	payload := strings.NewReader(fmt.Sprintf(`{"agentName": "%s"}`, name))
 
@@ -74,9 +76,10 @@ func registerAgent(endPoint, name string, key string) (agentDetails, error) {
 }
 
 type config struct {
-	Server   string `yaml:"server"`
-	AgentID  string `yaml:"agent-id"`
-	AgentKey string `yaml:"agent-key"`
+	Server             string `yaml:"server"`
+	AgentID            string `yaml:"agent-id"`
+	AgentKey           string `yaml:"agent-key"`
+	SkipCertValidation bool   `yaml:"skip-cert-validation"`
 }
 
 var oneConfigRead sync.Once
