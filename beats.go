@@ -82,6 +82,11 @@ func configureBeat(ip string) error {
 		}
 
 		if family == "debian" || family == "rhel" {
+			rmR, errB := execute("rm", path, filepath.Join("/", "etc", "filebeat", "filebeat.yml"))
+			if errB {
+				return fmt.Errorf("%s", rmR)
+			}
+			
 			err = generateFromTemplate(config, templateFile, configFile)
 			if err != nil {
 				return err
