@@ -172,11 +172,6 @@ protect=1`,
 		}
 
 		if family == "debian" || family == "rhel" {
-			rmR, errB := execute("rm", path, filepath.Join("/", "var", "ossec", "etc", "ossec.conf"))
-			if errB {
-				return fmt.Errorf("%s", rmR)
-			}
-
 			err = generateFromTemplate(config, templateFile, configFile)
 			if err != nil {
 				return err

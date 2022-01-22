@@ -65,7 +65,7 @@ func generateFromTemplate(data interface{}, tfile string, cfile string) error {
 		return err
 	}
 
-	writer, err := os.OpenFile(cfile, os.O_CREATE|os.O_WRONLY, os.ModePerm)
+	writer, err := os.OpenFile(cfile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.ModePerm)
 
 	if err != nil {
 		return err
