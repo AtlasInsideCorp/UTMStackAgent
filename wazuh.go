@@ -108,12 +108,12 @@ func configureWazuh(ip, key string) error {
 		case "debian":
 			templateFile = filepath.Join(path, "templates", "wazuh-debian.conf")
 
-			result, errB := execute("apt", filepath.Join(path, "wazuh"), "update")
+			result, errB := execute("apt", path, "update")
 			if errB {
 				return fmt.Errorf("%s", result)
 			}
 
-			result, errB = execute("apt", filepath.Join(path, "wazuh"), "install", "-y", "curl", "apt-transport-https", "lsb-release", "gnupg2", "wget")
+			result, errB = execute("apt", path, "install", "-y", "curl", "apt-transport-https", "lsb-release", "gnupg2", "wget")
 			if errB {
 				return fmt.Errorf("%s", result)
 			}
@@ -133,12 +133,12 @@ func configureWazuh(ip, key string) error {
 				return err
 			}
 
-			result, errB = execute("apt", filepath.Join(path, "wazuh"), "update")
+			result, errB = execute("apt", path, "update")
 			if errB {
 				return fmt.Errorf("%s", result)
 			}
 
-			result, errB = execute("apt", filepath.Join(path, "wazuh"), "install", "-y", "wazuh-agent")
+			result, errB = execute("apt", path, "install", "-y", "wazuh-agent")
 			if errB {
 				return fmt.Errorf("%s", result)
 			}
@@ -146,7 +146,7 @@ func configureWazuh(ip, key string) error {
 		case "rhel":
 			templateFile = filepath.Join(path, "templates", "wazuh-rhel.conf")
 
-			result, errB := execute("rpm", filepath.Join(path, "wazuh"), "--import", "https://packages.wazuh.com/key/GPG-KEY-WAZUH")
+			result, errB := execute("rpm", path, "--import", "https://packages.wazuh.com/key/GPG-KEY-WAZUH")
 			if errB {
 				return fmt.Errorf("%s", result)
 			}
@@ -165,7 +165,7 @@ protect=1`,
 				return err
 			}
 
-			result, errB = execute("yum", filepath.Join(path, "wazuh"), "install", "-y", "wazuh-agent")
+			result, errB = execute("yum", path, "install", "-y", "wazuh-agent")
 			if errB {
 				return fmt.Errorf("%s", result)
 			}
@@ -182,12 +182,12 @@ protect=1`,
 				return err
 			}
 
-			result, errB := execute("systemctl", filepath.Join(path, "beats"), "enable", "wazuh-agent")
+			result, errB := execute("systemctl", path, "enable", "wazuh-agent")
 			if errB {
 				return fmt.Errorf("%s", result)
 			}
 
-			result, errB = execute("systemctl", filepath.Join(path, "beats"), "restart", "wazuh-agent")
+			result, errB = execute("systemctl", path, "restart", "wazuh-agent")
 			if errB {
 				return fmt.Errorf("%s", result)
 			}
