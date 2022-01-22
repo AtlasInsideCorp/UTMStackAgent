@@ -3,6 +3,10 @@ beats/*
 wazuh/*
 *.exe
 *.msi
+*.zip
+utmstack-linux
+utmstack-macos
 dist/*
 Program Files 64/*
 config.yml
+os.go
