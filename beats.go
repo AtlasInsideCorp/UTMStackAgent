@@ -70,12 +70,12 @@ func configureBeat(ip string) error {
 
 		switch family {
 		case "debian":
-			result, err := execute("dpkg", filepath.Join(path, "beats"), "-i", "filebeat-oss-*-amd64.deb")
+			result, err := execute("dpkg", filepath.Join(path, "beats"), "-i", filepath.Join(path, "beats", "filebeat-oss-7.13.4-amd64.deb"))
 			if err {
 				return fmt.Errorf("%s", result)
 			}
 		case "rhel":
-			result, err := execute("yum", filepath.Join(path, "beats"), "localinstall", "-y", "filebeat-oss-*-x86_64.rpm")
+			result, err := execute("yum", filepath.Join(path, "beats"), "localinstall", "-y", filepath.Join(path, "beats", "filebeat-oss-7.13.4-x86_64.rpm"))
 			if err {
 				return fmt.Errorf("%s", result)
 			}

@@ -9,7 +9,7 @@ import (
 )
 
 func writeToFile(fileName string, body string) error {
-	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY, os.ModePerm)
+	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
 
 	if err != nil {
 		return err
