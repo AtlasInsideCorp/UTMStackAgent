@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"strconv"
 	"syscall"
+	"time"
 
 	"github.com/quantfall/holmes"
 )
@@ -58,22 +59,30 @@ func main() {
 
 			fmt.Println("Manager IP or FQDN:")
 			if _, err := fmt.Scanln(&ip); err != nil {
-				h.FatalError("can't get the manager IP or FQDN: %v", err)
+				h.Error("can't get the manager IP or FQDN: %v", err)
+				time.Sleep(10 * time.Second)
+				os.Exit(1)
 			}
 
 			fmt.Println("Registration Key:")
 			if _, err := fmt.Scanln(&utmKey); err != nil {
-				h.FatalError("can't get the registration key: %v", err)
+				h.Error("can't get the registration key: %v", err)
+				time.Sleep(10 * time.Second)
+				os.Exit(1)
 			}
 
 			fmt.Println("Skip certificate validation (yes or no):")
 			if _, err := fmt.Scanln(&skip); err != nil {
-				h.FatalError("can't get certificate validation response: %v", err)
+				h.Error("can't get certificate validation response: %v", err)
+				time.Sleep(10 * time.Second)
+				os.Exit(1)
 			}
 
 			hostName, err := os.Hostname()
 			if err != nil {
-				h.FatalError("can't get the hostname: %v", err)
+				h.Error("can't get the hostname: %v", err)
+				time.Sleep(10 * time.Second)
+				os.Exit(1)
 			}
 
 			var insecure bool
@@ -83,33 +92,45 @@ func main() {
 
 			agent, err := registerAgent(AGENTMANAGERPROTO+"://"+ip+":"+strconv.Itoa(AGENTMANAGERPORT), hostName, utmKey, insecure)
 			if err != nil {
-				h.FatalError("Can't register agent: %v", err)
+				h.Error("can't register agent: %v", err)
+				time.Sleep(10 * time.Second)
+				os.Exit(1)
 			}
 
 			cnf := config{Server: ip, AgentID: agent.ID, AgentKey: agent.Key, SkipCertValidation: insecure}
 			err = writeConfig(cnf)
 			if err != nil {
-				h.FatalError("can't write agent config: %v", err)
+				h.Error("can't write agent config: %v", err)
+				time.Sleep(10 * time.Second)
+				os.Exit(1)
 			}
 
 			err = configureBeat(ip)
 			if err != nil {
-				h.FatalError("can't configure beat: %v", err)
+				h.Error("can't configure beat: %v", err)
+				time.Sleep(10 * time.Second)
+				os.Exit(1)
 			}
 
 			err = configureWazuh(ip, cnf.AgentKey)
 			if err != nil {
-				h.FatalError("can't configure wazuh: %v", err)
+				h.Error("can't configure wazuh: %v", err)
+				time.Sleep(10 * time.Second)
+				os.Exit(1)
 			}
 
 			err = autoStart()
 			if err != nil {
-				h.FatalError("can't configure agent service: %v", err)
+				h.Error("can't configure agent service: %v", err)
+				time.Sleep(10 * time.Second)
+				os.Exit(1)
 			}
 		} else {
 			err := uninstall()
 			if err != nil {
-				h.FatalError("can't remove agent dependencies or configurations: %v", err)
+				h.Error("can't remove agent dependencies or configurations: %v", err)
+				time.Sleep(10 * time.Second)
+				os.Exit(1)
 			}
 		}
 		os.Exit(0)

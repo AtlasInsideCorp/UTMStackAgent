@@ -3,9 +3,11 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
 	"sync"
+	"time"
 )
 
 func startWazuh() {
@@ -13,7 +15,9 @@ func startWazuh() {
 	go func() {
 		path, err := getMyPath()
 		if err != nil {
-			h.FatalError("error getting path: %v", err)
+			h.Error("error getting path: %v", err)
+			time.Sleep(10 * time.Second)
+			os.Exit(1)
 		}
 		switch runtime.GOOS {
 		case "windows":
@@ -30,7 +34,9 @@ func startWazuh() {
 					"WazuhSvc",
 				)
 				if errB {
-					h.FatalError("error running wazuh: %s", result)
+					h.Error("error running wazuh: %s", result)
+					time.Sleep(10 * time.Second)
+					os.Exit(1)
 				}
 			})
 		}
@@ -41,7 +47,9 @@ func stopWazuh() {
 	var runOnce sync.Once
 	path, err := getMyPath()
 	if err != nil {
-		h.FatalError("error getting path: %v", err)
+		h.Error("error getting path: %v", err)
+		time.Sleep(10 * time.Second)
+		os.Exit(1)
 	}
 	switch runtime.GOOS {
 	case "windows":
@@ -53,7 +61,9 @@ func stopWazuh() {
 				"WazuhSvc",
 			)
 			if errB {
-				h.FatalError("error stopping wazuh: %s", result)
+				h.Error("error stopping wazuh: %s", result)
+				time.Sleep(10 * time.Second)
+				os.Exit(1)
 			}
 			execute(
 				filepath.Join(path, "wazuh", "windows", "wazuh-agent.exe"),

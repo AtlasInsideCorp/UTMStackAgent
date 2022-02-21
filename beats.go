@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
 	"sync"
+	"time"
 )
 
 func startBeat() {
@@ -12,7 +14,9 @@ func startBeat() {
 	go func() {
 		path, err := getMyPath()
 		if err != nil {
-			h.FatalError("error getting path: %v", err)
+			h.Error("error getting path: %v", err)
+			time.Sleep(10 * time.Second)
+			os.Exit(1)
 		}
 		switch runtime.GOOS {
 		case "windows":
@@ -25,7 +29,9 @@ func startBeat() {
 					"winlogbeat.yml",
 				)
 				if err {
-					h.FatalError("error running winlogbeat: %s", result)
+					h.Error("error running winlogbeat: %s", result)
+					time.Sleep(10 * time.Second)
+					os.Exit(1)
 				}
 			})
 		}

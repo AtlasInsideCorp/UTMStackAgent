@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
+	"time"
 )
 
 func registerAgent(endPoint, name string, key string, insecure bool) (agentDetails, error) {
@@ -57,7 +59,9 @@ func registerAgent(endPoint, name string, key string, insecure bool) (agentDetai
 
 		err = json.Unmarshal(body, &agentList)
 		if err != nil {
-			h.FatalError("can't decode agent details: %v", err)
+			h.Error("can't decode agent details: %v", err)
+			time.Sleep(10 * time.Second)
+			os.Exit(1)
 		}
 		h.Debug("Agent Details: %v", agentList)
 
@@ -68,7 +72,9 @@ func registerAgent(endPoint, name string, key string, insecure bool) (agentDetai
 
 	err = json.Unmarshal(body, &agent)
 	if err != nil {
-		h.FatalError("can't decode agent details: %v", err)
+		h.Error("can't decode agent details: %v", err)
+		time.Sleep(10 * time.Second)
+		os.Exit(1)
 	}
 	h.Debug("Agent Details: %v", agent)
 
@@ -88,7 +94,9 @@ var cnf config
 func readConfig() {
 	err := readYAML("config.yml", &cnf)
 	if err != nil {
-		h.FatalError("error reading config %v", err)
+		h.Error("error reading config %v", err)
+		time.Sleep(10 * time.Second)
+		os.Exit(1)
 	}
 }
 
