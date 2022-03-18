@@ -60,6 +60,7 @@ func registerAgent(endPoint, name string, key string, insecure bool) (agentDetai
 		err = json.Unmarshal(body, &agentList)
 		if err != nil {
 			h.Error("can't decode agent details: %v", err)
+			h.Debug("query result: %s", body)
 			time.Sleep(10 * time.Second)
 			os.Exit(1)
 		}
@@ -73,6 +74,7 @@ func registerAgent(endPoint, name string, key string, insecure bool) (agentDetai
 	err = json.Unmarshal(body, &agent)
 	if err != nil {
 		h.Error("can't decode agent details: %v", err)
+		h.Debug("query result: %s", body)
 		time.Sleep(10 * time.Second)
 		os.Exit(1)
 	}

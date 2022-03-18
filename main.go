@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"strconv"
 	"syscall"
 	"time"
 
@@ -47,12 +46,8 @@ func main() {
 			signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
 			<-signals
 			stopWazuh()
-		default:
-			fmt.Println("unknown option")
-		}
-	} else {
-		if _, err := os.ReadFile("config.yml"); err != nil {
-
+		
+		case "install":
 			var ip string
 			var utmKey string
 			var skip string
@@ -78,61 +73,26 @@ func main() {
 				os.Exit(1)
 			}
 
-			hostName, err := os.Hostname()
-			if err != nil {
-				h.Error("can't get the hostname: %v", err)
-				time.Sleep(10 * time.Second)
-				os.Exit(1)
-			}
+			install(ip, utmKey, skip)
+		
+		case "silent-install":
+			ip := os.Args[2]
+			utmKey := os.Args[3]
+			skip := os.Args[4]
 
-			var insecure bool
-			if skip == "yes" {
-				insecure = true
-			}
-
-			agent, err := registerAgent(AGENTMANAGERPROTO+"://"+ip+":"+strconv.Itoa(AGENTMANAGERPORT), hostName, utmKey, insecure)
-			if err != nil {
-				h.Error("can't register agent: %v", err)
-				time.Sleep(10 * time.Second)
-				os.Exit(1)
-			}
-
-			cnf := config{Server: ip, AgentID: agent.ID, AgentKey: agent.Key, SkipCertValidation: insecure}
-			err = writeConfig(cnf)
-			if err != nil {
-				h.Error("can't write agent config: %v", err)
-				time.Sleep(10 * time.Second)
-				os.Exit(1)
-			}
-
-			err = configureBeat(ip)
-			if err != nil {
-				h.Error("can't configure beat: %v", err)
-				time.Sleep(10 * time.Second)
-				os.Exit(1)
-			}
-
-			err = configureWazuh(ip, cnf.AgentKey)
-			if err != nil {
-				h.Error("can't configure wazuh: %v", err)
-				time.Sleep(10 * time.Second)
-				os.Exit(1)
-			}
-
-			err = autoStart()
-			if err != nil {
-				h.Error("can't configure agent service: %v", err)
-				time.Sleep(10 * time.Second)
-				os.Exit(1)
-			}
-		} else {
-			err := uninstall()
-			if err != nil {
-				h.Error("can't remove agent dependencies or configurations: %v", err)
-				time.Sleep(10 * time.Second)
-				os.Exit(1)
-			}
+			install(ip, utmKey, skip)
+		
+		default:
+			fmt.Println("unknown option")
 		}
+	} else {
+		err := uninstall()
+		if err != nil {
+			h.Error("can't remove agent dependencies or configurations: %v", err)
+			time.Sleep(10 * time.Second)
+			os.Exit(1)
+		}
+
 		os.Exit(0)
 	}
 }
