@@ -9,4 +9,3 @@ utmstack-macos
 dist/*
 Program Files 64/*
 config.yml
-os.go
