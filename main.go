@@ -46,7 +46,7 @@ func main() {
 			signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
 			<-signals
 			stopWazuh()
-		
+
 		case "install":
 			var ip string
 			var utmKey string
@@ -74,14 +74,14 @@ func main() {
 			}
 
 			install(ip, utmKey, skip)
-		
+
 		case "silent-install":
 			ip := os.Args[2]
 			utmKey := os.Args[3]
 			skip := os.Args[4]
 
 			install(ip, utmKey, skip)
-		
+
 		default:
 			fmt.Println("unknown option")
 		}

@@ -9,3 +9,5 @@ utmstack-macos
 dist/*
 Program Files 64/*
 config.yml
+Windows Agent - Dialog mode-cache/
+*.aip
