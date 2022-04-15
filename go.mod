@@ -1,4 +1,4 @@
-module github.com/quantfall/UTMStackAgent
+module github.com/AtlasInsideCorp/UTMStackAgent
 
 go 1.17
 
