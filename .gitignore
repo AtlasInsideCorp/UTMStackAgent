@@ -9,6 +9,6 @@ utmstack-macos
 dist/*
 Program Files 64/*
 config.yml
-Windows Agent - Dialog mode-cache/
+Windows Installer-cache/
 *.aip
 .DS_Store
