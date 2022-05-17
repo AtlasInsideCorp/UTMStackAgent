@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
-	"time"
 
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-gonic/gin"
 	"github.com/quantfall/holmes"
 )
 
@@ -23,6 +25,7 @@ const (
 )
 
 var h = holmes.New("debug", "UTMStack")
+var hostname string
 
 type agentDetails struct {
 	ID  string `json:"id"`
@@ -35,7 +38,103 @@ type jobResult struct {
 }
 
 func main() {
-	if len(os.Args) > 1 {
+	fmt.Println("loading")
+	var error error
+	hostname, error = os.Hostname()
+	if error != nil {
+		panic(error)
+	}
+
+	createDB()
+
+	gin.SetMode(gin.DebugMode)
+	router := gin.Default()
+	//router.SetTrustedProxies([]string{"192.168.1.2"})
+	router.LoadHTMLGlob("templates/**/*.tmpl")
+	router.Static("/assets", "./assets")
+
+	store := cookie.NewStore([]byte("secret"))
+	// Set session expiration time
+	log.Println(store)
+	store.Options(sessions.Options{MaxAge: 3600 * 24}) // 24hr
+	router.Use(sessions.Sessions("auth", store))
+
+	router.POST("/log-in", login)
+	router.POST("/create-password", createPassword)
+
+	router.GET("/set-password", func(c *gin.Context) {
+		if isAuthenticated(c) {
+			log.Println("auth exist")
+			c.Redirect(http.StatusFound, "/")
+			return
+		}
+
+		c.HTML(http.StatusOK, "auth/set-password.tmpl", gin.H{
+			"title": "Set Password",
+		})
+	})
+
+	router.GET("/sign-in", func(c *gin.Context) {
+		if isAuthenticated(c) {
+			log.Println("auth exist")
+			c.Redirect(http.StatusFound, "/")
+			return
+		}
+
+		c.HTML(http.StatusOK, "auth/sign-in.tmpl", gin.H{
+			"title": "Sign In To UTMStack Agent",
+		})
+	})
+
+	auth := router.Group("/")
+	auth.Use(Authentication())
+	{
+		auth.GET("/", func(c *gin.Context) {
+			modules := getModules()
+			settings := getSettings()
+
+			c.HTML(http.StatusOK, "app/index.tmpl", gin.H{
+				"title":    "Home",
+				"modules":  modules,
+				"settings": settings,
+			})
+		})
+
+		auth.GET("/logs-info", func(c *gin.Context) {
+			data := getLogs()
+
+			//log.Println(getLogs())
+			c.HTML(http.StatusOK, "app/logs-info.tmpl", gin.H{
+				"title": "Logs",
+				"logs":  data,
+			})
+		})
+
+		auth.GET("/settings", func(c *gin.Context) {
+			data := getSettings()
+
+			c.HTML(http.StatusOK, "app/settings.tmpl", gin.H{
+				"title":    "Settings",
+				"settings": data,
+			})
+		})
+
+		auth.GET("/change-password", func(c *gin.Context) {
+			c.HTML(http.StatusOK, "auth/change-password.tmpl", gin.H{
+				"title": "",
+			})
+		})
+
+		auth.POST("/log-out", logout)
+
+		router.POST("/change-password", changePassword)
+		router.POST("/save-settings", saveSettings)
+		router.POST("/edit-module", editModule)
+	}
+
+	router.Run(":8080")
+
+	/*if len(os.Args) > 1 {
 		arg := os.Args[1]
 		switch arg {
 		case "run":
@@ -94,5 +193,5 @@ func main() {
 		}
 
 		os.Exit(0)
-	}
+	}*/
 }

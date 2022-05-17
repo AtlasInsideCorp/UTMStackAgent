@@ -4,6 +4,8 @@ wazuh/*
 *.exe
 *.msi
 *.zip
+*.db
+*.exe~
 utmstack-linux
 utmstack-macos
 dist/*
