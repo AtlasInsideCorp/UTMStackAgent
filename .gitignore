@@ -9,6 +9,7 @@ utmstack-macos
 dist/*
 Program Files 64/*
 config.yml
-Windows Installer-cache/
+Windows Installer-cache/*
+Generated Images/*
 *.aip
 .DS_Store
