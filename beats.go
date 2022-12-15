@@ -22,8 +22,8 @@ func startBeat() {
 		case "windows":
 			runOnce.Do(func() {
 				result, err := execute(
-					filepath.Join(path, "beats", "windows", "winlogbeat", "winlogbeat.exe"),
-					filepath.Join(path, "beats", "windows", "winlogbeat"),
+					filepath.Join(path, "beats", "winlogbeat", "winlogbeat.exe"),
+					filepath.Join(path, "beats", "winlogbeat"),
 					"--strict.perms=false",
 					"-c",
 					"winlogbeat.yml",
@@ -59,7 +59,7 @@ func configureBeat(ip string) error {
 
 	switch runtime.GOOS {
 	case "windows":
-		configFile := filepath.Join(path, "beats", "windows", "winlogbeat", "winlogbeat.yml")
+		configFile := filepath.Join(path, "beats", "winlogbeat", "winlogbeat.yml")
 		templateFile := filepath.Join(path, "templates", "winlogbeat.yml")
 		err := generateFromTemplate(config, templateFile, configFile)
 		if err != nil {
