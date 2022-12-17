@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -31,7 +31,7 @@ func registerAgent(endPoint, name string, key string, insecure bool) (agentDetai
 	}
 	defer regRes.Body.Close()
 
-	body, err = ioutil.ReadAll(regRes.Body)
+	body, err = io.ReadAll(regRes.Body)
 	if err != nil {
 		return agentDetails{}, err
 	}
@@ -50,7 +50,7 @@ func registerAgent(endPoint, name string, key string, insecure bool) (agentDetai
 		}
 		defer keyRes.Body.Close()
 
-		body, err = ioutil.ReadAll(keyRes.Body)
+		body, err = io.ReadAll(keyRes.Body)
 		if err != nil {
 			return agentDetails{}, err
 		}
