@@ -9,7 +9,7 @@ import (
 func detectLinuxFamily() (string, error) {
 	var pmCommands map[string]string = map[string]string{
 		"debian": "apt list",
-		"rhel":   "yum version",
+		"rhel":   "yum list",
 	}
 
 	for dist, command := range pmCommands {
