@@ -7,7 +7,6 @@ import (
 )
 
 func install(ip, utmKey, skip string) {
-
 	var insecure bool
 	if skip == "yes" {
 		insecure = true

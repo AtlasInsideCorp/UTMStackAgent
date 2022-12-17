@@ -64,7 +64,7 @@ func registerAgent(endPoint, name string, key string, insecure bool) (agentDetai
 			time.Sleep(10 * time.Second)
 			os.Exit(1)
 		}
-		h.Debug("Agent Details: %v", agentList)
+		h.Debug("Successful registered. Agent Details: %v", agentList)
 
 		return agentList[0], nil
 	}
