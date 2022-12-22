@@ -13,37 +13,37 @@ func autoStart() error {
 	}
 	switch runtime.GOOS {
 	case "windows":
-		result, err := execute(".\nssm.exe", path, "install", "utmstack", "utmstack-windows.exe", "run")
+		result, err := execute("nssm.exe", path, "install", "utmstack", "utmstack-windows.exe", "run")
 		if err {
 			return fmt.Errorf("%s", result)
 		}
 
-		result, err = execute(".\nssm.exe", path, "set", "utmstack", "AppDirectory", path)
+		result, err = execute("nssm.exe", path, "set", "utmstack", "AppDirectory", path)
 		if err {
 			return fmt.Errorf("%s", result)
 		}
 
-		result, err = execute(".\nssm.exe", path, "set", "utmstack", "DisplayName", "UTMStack Agent")
+		result, err = execute("nssm.exe", path, "set", "utmstack", "DisplayName", "UTMStack Agent")
 		if err {
 			return fmt.Errorf("%s", result)
 		}
 
-		result, err = execute(".\nssm.exe", path, "set", "utmstack", "AppExit", "Default", "Restart")
+		result, err = execute("nssm.exe", path, "set", "utmstack", "AppExit", "Default", "Restart")
 		if err {
 			return fmt.Errorf("%s", result)
 		}
 
-		result, err = execute(".\nssm.exe", path, "set", "utmstack", "Start", "SERVICE_AUTO_START")
+		result, err = execute("nssm.exe", path, "set", "utmstack", "Start", "SERVICE_AUTO_START")
 		if err {
 			return fmt.Errorf("%s", result)
 		}
 
-		result, err = execute(".\nssm.exe", path, "set", "utmstack", "ObjectName", "LocalSystem")
+		result, err = execute("nssm.exe", path, "set", "utmstack", "ObjectName", "LocalSystem")
 		if err {
 			return fmt.Errorf("%s", result)
 		}
 
-		result, err = execute(".\nssm.exe", path, "start", "utmstack")
+		result, err = execute("nssm.exe", path, "start", "utmstack")
 		if err {
 			return fmt.Errorf("%s", result)
 		}
