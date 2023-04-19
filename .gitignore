@@ -1,6 +1,5 @@
 keys/*
 beats/*
-wazuh/*
 *.exe
 *.msi
 *.zip
