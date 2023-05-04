@@ -41,13 +41,6 @@ func install(ip, utmKey, skip string) {
 		os.Exit(1)
 	}
 
-	err = configureWazuh(ip, cnf.AgentKey)
-	if err != nil {
-		h.Error("can't configure wazuh: %v", err)
-		time.Sleep(10 * time.Second)
-		os.Exit(1)
-	}
-
 	err = autoStart()
 	if err != nil {
 		h.Error("can't configure agent service: %v", err)

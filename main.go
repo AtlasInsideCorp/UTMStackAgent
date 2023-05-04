@@ -41,11 +41,9 @@ func main() {
 		case "run":
 			incidentResponse()
 			startBeat()
-			startWazuh()
 			signals := make(chan os.Signal, 1)
 			signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
 			<-signals
-			stopWazuh()
 
 		case "install":
 			var ip string

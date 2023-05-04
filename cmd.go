@@ -7,7 +7,7 @@ import (
 
 func execute(c string, dir string, arg ...string) (string, bool) {
 	cmd := exec.Command(c, arg...)
-	
+
 	cmd.Dir = dir
 	if errors.Is(cmd.Err, exec.ErrDot) {
 		cmd.Err = nil
