@@ -95,13 +95,6 @@ func main() {
 				os.Exit(1)
 			}
 
-			err = autoStart()
-			if err != nil {
-				h.Error("can't configure agent service: %v", err)
-				time.Sleep(10 * time.Second)
-				os.Exit(1)
-			}
-
 			fmt.Println("UMTStack Agent configured correctly")
 			h.Info("UMTStack Agent configured correctly")
 			os.Exit(0)
