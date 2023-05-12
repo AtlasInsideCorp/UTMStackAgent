@@ -63,34 +63,6 @@ func main() {
 			<-signals
 
 		case "install":
-			var ip string
-			var utmKey string
-			var skip string
-
-			fmt.Println("Manager IP or FQDN:")
-			if _, err := fmt.Scanln(&ip); err != nil {
-				h.Error("can't get the manager IP or FQDN: %v", err)
-				time.Sleep(10 * time.Second)
-				os.Exit(1)
-			}
-
-			fmt.Println("Registration Key:")
-			if _, err := fmt.Scanln(&utmKey); err != nil {
-				h.Error("can't get the registration key: %v", err)
-				time.Sleep(10 * time.Second)
-				os.Exit(1)
-			}
-
-			fmt.Println("Skip certificate validation (yes or no):")
-			if _, err := fmt.Scanln(&skip); err != nil {
-				h.Error("can't get certificate validation response: %v", err)
-				time.Sleep(10 * time.Second)
-				os.Exit(1)
-			}
-
-			install(ip, utmKey, skip)
-
-		case "silent-install":
 			ip := os.Args[2]
 			utmKey := os.Args[3]
 			skip := os.Args[4]
