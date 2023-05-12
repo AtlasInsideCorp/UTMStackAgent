@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+option go_package = "AgentManager/agent";
+
+package agent;
+
+import "google/protobuf/timestamp.proto";
+service AgentService {
+  rpc RegisterAgent(AgentRequest) returns (AgentResponse) {}
+  rpc AgentStream(stream BidirectionalStream) returns (stream BidirectionalStream) {}
+  rpc DeleteAgent(AgentRequest) returns (AgentResponse) {}
+  rpc Ping(stream PingResponse) returns (stream  PingRequest) {}
+}
+
+service PanelService {
+  rpc ProcessCommand (stream UtmCommand) returns (stream CommandResult){}
+}
+
+
+message Agent {
+  string ip = 1;
+  string hostname = 2;
+  string os = 3;
+  AgentStatus status = 4;
+  string platform = 5;
+  string version = 6;
+  string token = 7;
+}
+
+enum AgentStatus {
+  ONLINE = 0;
+  OFFLINE = 1;
+  UNKNOWN = 2;
+}
+
+message AgentRequest {
+  string ip = 1;
+  string hostname = 2;
+  string  os = 3;
+  string platform = 4;
+  string version = 5;
+}
+
+message AgentResponse {
+  uint32  id = 1;
+  string token = 2;
+}
+
+message UtmCommand {
+  string token = 1;
+  string command = 2;
+  string executed_by = 3;
+  string cmd_id = 4;
+
+}
+
+message CommandResult {
+  string token = 1;
+  string result = 2;
+  google.protobuf.Timestamp executed_at = 3;
+  string cmd_id = 4;
+}
+
+message PingRequest {
+  string agent_token = 1;
+}
+
+message PingResponse {
+  bool is_alive = 1;
+  string  token = 2;
+}
+
+message BidirectionalStream {
+  oneof stream_message {
+    UtmCommand command = 1;
+    CommandResult result = 2;
+    AuthResponse auth_response = 3;
+  }
+}
+message AuthResponse {
+  uint64 agent_id = 1;
+  string token = 2;
+}
+
