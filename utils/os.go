@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"fmt"
@@ -6,7 +6,9 @@ import (
 	"strings"
 )
 
-func detectLinuxFamily() (string, error) {
+// DetectLinuxFamily is a function that detects the Linux distribution the program is running on.
+// Returns the name of the detected distribution and an error if the distribution cannot be determined.
+func DetectLinuxFamily() (string, error) {
 	var pmCommands map[string]string = map[string]string{
 		"debian": "apt list",
 		"rhel":   "yum list",

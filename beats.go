@@ -71,7 +71,7 @@ func configureBeat(ip string) error {
 		configFile := filepath.Join("/", "etc", "filebeat", "filebeat.yml")
 		templateFile := filepath.Join(path, "templates", "filebeat-linux.yml")
 
-		family, err := detectLinuxFamily()
+		family, err := utils.DetectLinuxFamily()
 		if err != nil {
 			return err
 		}
