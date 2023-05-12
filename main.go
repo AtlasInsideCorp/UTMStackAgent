@@ -1,14 +1,17 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strconv"
 	"syscall"
 	"time"
 
+	pb "github.com/AtlasInsideCorp/UTMStackAgent/agent"
 	"github.com/AtlasInsideCorp/UTMStackAgent/configuration"
 	"github.com/AtlasInsideCorp/UTMStackAgent/utils"
 	"github.com/quantfall/holmes"
@@ -63,11 +66,45 @@ func main() {
 			<-signals
 
 		case "install":
-			ip := os.Args[2]
-			utmKey := os.Args[3]
-			skip := os.Args[4]
+			cnf := configuration.GetInitialConfig()
 
-			install(ip, utmKey, skip)
+			// Connect to the gRPC server
+			conn, err := pb.ConnectToServer(cnf, cons, cnf.Server+":"+strconv.Itoa(cons.AGENTMANAGERPORT))
+			if err != nil {
+				fmt.Printf("failed to connect to gRPC server: %v", err)
+				h.FatalError("failed to connect to gRPC server: %v", err)
+			}
+			defer conn.Close()
+
+			// Create a client for AgentService
+			agentClient := pb.NewAgentServiceClient(conn)
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+
+			// Register the agent and write the config to the file
+			err = pb.RegisterAgent(&cnf, agentClient, ctx)
+			if err != nil {
+				fmt.Printf("failed to register agent: %v", err)
+				h.FatalError("failed to register agent: ", err)
+			}
+
+			err = configureBeat(cnf.Server)
+			if err != nil {
+				h.Error("can't configure beat: %v", err)
+				time.Sleep(10 * time.Second)
+				os.Exit(1)
+			}
+
+			err = autoStart()
+			if err != nil {
+				h.Error("can't configure agent service: %v", err)
+				time.Sleep(10 * time.Second)
+				os.Exit(1)
+			}
+
+			fmt.Println("UMTStack Agent configured correctly")
+			h.Info("UMTStack Agent configured correctly")
+			os.Exit(0)
 
 		default:
 			fmt.Println("unknown option")
