@@ -14,7 +14,7 @@ import (
 func startBeat() {
 	var runOnce sync.Once
 	go func() {
-		path, err := getMyPath()
+		path, err := utils.GetMyPath()
 		if err != nil {
 			h.Error("error getting path: %v", err)
 			time.Sleep(10 * time.Second)
@@ -41,7 +41,7 @@ func startBeat() {
 }
 
 func configureBeat(ip string) error {
-	path, err := getMyPath()
+	path, err := utils.GetMyPath()
 	if err != nil {
 		return err
 	}
@@ -63,7 +63,7 @@ func configureBeat(ip string) error {
 	case "windows":
 		configFile := filepath.Join(path, "beats", "winlogbeat", "winlogbeat.yml")
 		templateFile := filepath.Join(path, "templates", "winlogbeat.yml")
-		err := generateFromTemplate(config, templateFile, configFile)
+		err := utils.GenerateFromTemplate(config, templateFile, configFile)
 		if err != nil {
 			return err
 		}
@@ -90,7 +90,7 @@ func configureBeat(ip string) error {
 		}
 
 		if family == "debian" || family == "rhel" {
-			err = generateFromTemplate(config, templateFile, configFile)
+			err = utils.GenerateFromTemplate(config, templateFile, configFile)
 			if err != nil {
 				return err
 			}

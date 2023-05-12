@@ -9,7 +9,7 @@ import (
 )
 
 func autoStart() error {
-	path, err := getMyPath()
+	path, err := utils.GetMyPath()
 	if err != nil {
 		return err
 	}
@@ -57,7 +57,7 @@ func autoStart() error {
 		scriptFile := filepath.Join("/", "usr", "local", "bin", "utmstack-agent.sh")
 		scriptTemplateFile := filepath.Join(path, "templates", "utmstack-agent-bash.sh")
 
-		err := generateFromTemplate(bash{Path: path}, scriptTemplateFile, scriptFile)
+		err := utils.GenerateFromTemplate(bash{Path: path}, scriptTemplateFile, scriptFile)
 		if err != nil {
 			return err
 		}
@@ -79,7 +79,7 @@ ExecStart=/usr/local/bin/utmstack-agent.sh
 [Install]
 WantedBy=multi-user.target`
 
-		err = writeToFile("/etc/systemd/system/utmstack.service", incidentServiceConfig)
+		err = utils.WriteToFile("/etc/systemd/system/utmstack.service", incidentServiceConfig)
 		if err != nil {
 			return err
 		}

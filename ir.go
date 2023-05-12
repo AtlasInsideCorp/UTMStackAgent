@@ -24,7 +24,7 @@ func incidentResponse() {
 			h.Error("error getting hostname: %v", err)
 		}
 
-		path, err := getMyPath()
+		path, err := utils.GetMyPath()
 		if err != nil {
 			h.Error("error getting path: %v", err)
 		}

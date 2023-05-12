@@ -10,7 +10,7 @@ import (
 )
 
 func uninstall() error {
-	path, err := getMyPath()
+	path, err := utils.GetMyPath()
 	if err != nil {
 		return err
 	}

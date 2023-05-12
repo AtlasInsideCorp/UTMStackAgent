@@ -10,6 +10,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/AtlasInsideCorp/UTMStackAgent/utils"
 )
 
 func registerAgent(endPoint, name string, key string, insecure bool) (agentDetails, error) {
@@ -94,7 +96,7 @@ var oneConfigRead sync.Once
 var cnf config
 
 func readConfig() {
-	err := readYAML("config.yml", &cnf)
+	err := utils.ReadYAML("config.yml", &cnf)
 	if err != nil {
 		h.Error("error reading config %v", err)
 		time.Sleep(10 * time.Second)
@@ -108,7 +110,7 @@ func getConfig() config {
 }
 
 func writeConfig(cnf config) error {
-	err := writeYAML("config.yml", cnf)
+	err := utils.WriteYAML("config.yml", cnf)
 	if err != nil {
 		return err
 	}
