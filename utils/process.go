@@ -28,3 +28,26 @@ func IsProcessRunning(processName string) (bool, error) {
 
 	return false, nil
 }
+
+func StopProcess(processName string) error {
+	running, err := IsProcessRunning(processName)
+	if err != nil {
+		return err
+	}
+
+	if running {
+		var cmd *exec.Cmd
+		if runtime.GOOS == "windows" {
+			cmd = exec.Command("taskkill", "/IM", processName, "/F")
+		} else {
+			cmd = exec.Command("pkill", processName)
+		}
+
+		err := cmd.Run()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
