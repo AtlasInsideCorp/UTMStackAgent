@@ -2,11 +2,14 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
+	"github.com/AtlasInsideCorp/UTMStackAgent/utils"
 	"github.com/quantfall/holmes"
 )
 
@@ -35,6 +38,18 @@ type jobResult struct {
 }
 
 func main() {
+	// Get current path
+	path, err := utils.GetMyPath()
+	if err != nil {
+		fmt.Printf("Failed to get current path: %v", err)
+		h.FatalError("Failed to get current path: %v", err)
+	}
+
+	// Configuring log saving
+	var logger = utils.CreateLogger(filepath.Join(path, "logs", "utmstack_agent.log"))
+	defer logger.Close()
+	log.SetOutput(logger)
+
 	if len(os.Args) > 1 {
 		arg := os.Args[1]
 		switch arg {
