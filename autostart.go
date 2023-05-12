@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"path/filepath"
 	"runtime"
+
+	"github.com/AtlasInsideCorp/UTMStackAgent/utils"
 )
 
 func autoStart() error {
@@ -13,37 +15,37 @@ func autoStart() error {
 	}
 	switch runtime.GOOS {
 	case "windows":
-		result, err := execute("nssm.exe", path, "install", "utmstack", "utmstack-windows.exe", "run")
+		result, err := utils.Execute("nssm.exe", path, "install", "utmstack", "utmstack-windows.exe", "run")
 		if err {
 			return fmt.Errorf("%s", result)
 		}
 
-		result, err = execute("nssm.exe", path, "set", "utmstack", "AppDirectory", path)
+		result, err = utils.Execute("nssm.exe", path, "set", "utmstack", "AppDirectory", path)
 		if err {
 			return fmt.Errorf("%s", result)
 		}
 
-		result, err = execute("nssm.exe", path, "set", "utmstack", "DisplayName", "UTMStack Agent")
+		result, err = utils.Execute("nssm.exe", path, "set", "utmstack", "DisplayName", "UTMStack Agent")
 		if err {
 			return fmt.Errorf("%s", result)
 		}
 
-		result, err = execute("nssm.exe", path, "set", "utmstack", "AppExit", "Default", "Restart")
+		result, err = utils.Execute("nssm.exe", path, "set", "utmstack", "AppExit", "Default", "Restart")
 		if err {
 			return fmt.Errorf("%s", result)
 		}
 
-		result, err = execute("nssm.exe", path, "set", "utmstack", "Start", "SERVICE_AUTO_START")
+		result, err = utils.Execute("nssm.exe", path, "set", "utmstack", "Start", "SERVICE_AUTO_START")
 		if err {
 			return fmt.Errorf("%s", result)
 		}
 
-		result, err = execute("nssm.exe", path, "set", "utmstack", "ObjectName", "LocalSystem")
+		result, err = utils.Execute("nssm.exe", path, "set", "utmstack", "ObjectName", "LocalSystem")
 		if err {
 			return fmt.Errorf("%s", result)
 		}
 
-		result, err = execute("nssm.exe", path, "start", "utmstack")
+		result, err = utils.Execute("nssm.exe", path, "start", "utmstack")
 		if err {
 			return fmt.Errorf("%s", result)
 		}
@@ -60,7 +62,7 @@ func autoStart() error {
 			return err
 		}
 
-		result, errB := execute("chmod", path, "755", filepath.Join("/", "usr", "local", "bin", "utmstack-agent.sh"))
+		result, errB := utils.Execute("chmod", path, "755", filepath.Join("/", "usr", "local", "bin", "utmstack-agent.sh"))
 		if errB {
 			return fmt.Errorf("%s", result)
 		}
@@ -82,12 +84,12 @@ WantedBy=multi-user.target`
 			return err
 		}
 
-		result, errB = execute("systemctl", filepath.Join(path, "beats"), "enable", "utmstack")
+		result, errB = utils.Execute("systemctl", filepath.Join(path, "beats"), "enable", "utmstack")
 		if errB {
 			return fmt.Errorf("%s", result)
 		}
 
-		result, errB = execute("systemctl", filepath.Join(path, "beats"), "restart", "utmstack")
+		result, errB = utils.Execute("systemctl", filepath.Join(path, "beats"), "restart", "utmstack")
 		if errB {
 			return fmt.Errorf("%s", result)
 		}

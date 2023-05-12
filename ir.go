@@ -11,6 +11,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/AtlasInsideCorp/UTMStackAgent/utils"
 )
 
 var IRMutex sync.Mutex
@@ -58,9 +60,9 @@ func incidentResponse() {
 				var response string
 				h.Debug("Executing command: %v", cmd)
 				if len(cmd) > 1 {
-					response, _ = execute(cmd[0], path, cmd[1:]...)
+					response, _ = utils.Execute(cmd[0], path, cmd[1:]...)
 				} else {
-					response, _ = execute(cmd[0], path)
+					response, _ = utils.Execute(cmd[0], path)
 				}
 				err := commandResponse(
 					AGENTMANAGERPROTO+

@@ -7,6 +7,8 @@ import (
 	"runtime"
 	"sync"
 	"time"
+
+	"github.com/AtlasInsideCorp/UTMStackAgent/utils"
 )
 
 func startBeat() {
@@ -21,7 +23,7 @@ func startBeat() {
 		switch runtime.GOOS {
 		case "windows":
 			runOnce.Do(func() {
-				result, err := execute(
+				result, err := utils.Execute(
 					filepath.Join(path, "beats", "winlogbeat", "winlogbeat.exe"),
 					filepath.Join(path, "beats", "winlogbeat"),
 					"--strict.perms=false",
@@ -76,12 +78,12 @@ func configureBeat(ip string) error {
 
 		switch family {
 		case "debian":
-			result, err := execute("dpkg", filepath.Join(path, "beats"), "-i", filepath.Join(path, "beats", "filebeat-oss-7.13.4-amd64.deb"))
+			result, err := utils.Execute("dpkg", filepath.Join(path, "beats"), "-i", filepath.Join(path, "beats", "filebeat-oss-7.13.4-amd64.deb"))
 			if err {
 				return fmt.Errorf("%s", result)
 			}
 		case "rhel":
-			result, err := execute("yum", filepath.Join(path, "beats"), "localinstall", "-y", filepath.Join(path, "beats", "filebeat-oss-7.13.4-x86_64.rpm"))
+			result, err := utils.Execute("yum", filepath.Join(path, "beats"), "localinstall", "-y", filepath.Join(path, "beats", "filebeat-oss-7.13.4-x86_64.rpm"))
 			if err {
 				return fmt.Errorf("%s", result)
 			}
@@ -93,17 +95,17 @@ func configureBeat(ip string) error {
 				return err
 			}
 
-			result, err := execute("filebeat", filepath.Join(path, "beats"), "modules", "enable", "system")
+			result, err := utils.Execute("filebeat", filepath.Join(path, "beats"), "modules", "enable", "system")
 			if err {
 				return fmt.Errorf("%s", result)
 			}
 
-			result, err = execute("systemctl", filepath.Join(path, "beats"), "enable", "filebeat")
+			result, err = utils.Execute("systemctl", filepath.Join(path, "beats"), "enable", "filebeat")
 			if err {
 				return fmt.Errorf("%s", result)
 			}
 
-			result, err = execute("systemctl", filepath.Join(path, "beats"), "restart", "filebeat")
+			result, err = utils.Execute("systemctl", filepath.Join(path, "beats"), "restart", "filebeat")
 			if err {
 				return fmt.Errorf("%s", result)
 			}
