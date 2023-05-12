@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/AtlasInsideCorp/UTMStackAgent/configuration"
 	"github.com/AtlasInsideCorp/UTMStackAgent/utils"
 	"github.com/quantfall/holmes"
 )
@@ -25,6 +26,7 @@ const (
 	TLSKEY                   = "client.key"
 )
 
+var cons = configuration.GetConstConfig()
 var h = holmes.New("debug", "UTMStack")
 
 type agentDetails struct {
