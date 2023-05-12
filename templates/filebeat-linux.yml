@@ -3,36 +3,37 @@ filebeat.inputs:
 - type: log
   enabled: false
   paths:
-  - /var/log/*.log
+    - /var/log/*.log
 
 - type: filestream
+  #id: my-filestream-id
   enabled: false
   paths:
-  - /var/log/*.log
+    - /var/log/*.log
 
 # ============================== Filebeat modules ==============================
 filebeat.config.modules:
- path: ${path.config}/modules.d/*.yml
- reload.enabled: false
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
 
 # ======================= Elasticsearch template setting =======================
 setup.template.settings:
- index.number_of_shards: 1
+  index.number_of_shards: 1
 
 # =================================== Kibana ===================================
 setup.kibana:
 
 # ------------------------------ Logstash Output -------------------------------
 output.logstash:
- hosts: ["{{ .IP }}:5044"]
- ssl.certificate_authorities: ["{{ .CA }}"]
- ssl.certificate: "{{ .ClientCert }}"
- ssl.key: "{{ .ClientKey }}"
- ssl.verification_mode: none
+  hosts: ["{{ .IP }}:5044"]
+  ssl.certificate_authorities: ["{{ .CA }}"]
+  ssl.certificate: "{{ .ClientCert }}"
+  ssl.key: "{{ .ClientKey }}"
+  ssl.verification_mode: none
 
 # ================================= Processors =================================
 processors:
-- add_host_metadata: ~
-- add_cloud_metadata: ~
-- add_docker_metadata: ~
-- add_kubernetes_metadata: ~
+  - add_host_metadata: ~
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~

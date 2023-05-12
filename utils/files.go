@@ -11,7 +11,7 @@ import (
 // writeToFile writes the given `body` string to a file with the specified `fileName`.
 // If the file does not exist, it will be created. If the file already exists, its contents
 // will be overwritten with the new `body` string.
-func WriteToFile(fileName string, body string) error {
+func writeToFile(fileName string, body string) error {
 	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
 	if err != nil {
 		return err
@@ -28,7 +28,7 @@ func WriteYAML(url string, data interface{}) error {
 	if err != nil {
 		return err
 	}
-	err = WriteToFile(url, string(config[:]))
+	err = writeToFile(url, string(config[:]))
 	if err != nil {
 		return err
 	}
