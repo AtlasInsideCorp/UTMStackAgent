@@ -12,6 +12,7 @@ import (
 	"time"
 
 	pb "github.com/AtlasInsideCorp/UTMStackAgent/agent"
+	"github.com/AtlasInsideCorp/UTMStackAgent/beat"
 	"github.com/AtlasInsideCorp/UTMStackAgent/configuration"
 	"github.com/AtlasInsideCorp/UTMStackAgent/stream"
 	"github.com/AtlasInsideCorp/UTMStackAgent/utils"
@@ -71,9 +72,11 @@ func main() {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 
+			// Runs the necessary Beats
+			beat.RunBeats(h)
+
 			// Start the AgentStream
 			stream.StartStream(cnf, agentClient, ctx, cancel, h)
-			startBeat()
 			signals := make(chan os.Signal, 1)
 			signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
 			<-signals
@@ -101,12 +104,8 @@ func main() {
 				h.FatalError("failed to register agent: ", err)
 			}
 
-			err = configureBeat(cnf.Server)
-			if err != nil {
-				h.Error("can't configure beat: %v", err)
-				time.Sleep(10 * time.Second)
-				os.Exit(1)
-			}
+			// Install and configure the necessary Beats
+			beat.InstallBeats(cnf.Server, cons, h)
 
 			fmt.Println("UMTStack Agent configured correctly")
 			h.Info("UMTStack Agent configured correctly")
