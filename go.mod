@@ -1,6 +1,6 @@
 module github.com/AtlasInsideCorp/UTMStackAgent
 
-go 1.17
+go 1.20
 
 require (
 	github.com/quantfall/holmes v1.3.0
