@@ -1,0 +1,49 @@
+name: dev build
+
+on:
+  push:
+    tags: 
+      - 'dev*'
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: ^1.20 
+      id: go
+    
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'
+
+    - name: Build for Linux
+      env:
+        GOOS: linux
+        GOARCH: amd64
+      run: go build -o utmstack-linux -v .
+
+    - name: Build for Windows
+      env:
+        GOOS: windows
+        GOARCH: amd64
+      run: go build -o utmstack-windows.exe -v .
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install google-cloud-storage
+        pip install requests
+        pip install pytz
+
+    - name: Run Python script
+      working-directory: ".github/scripts"
+      run: python deploy.py ${{ github.ref }}

@@ -13,3 +13,4 @@ Windows Installer-cache/*
 Generated Images/*
 *.aip
 .DS_Store
+.env
