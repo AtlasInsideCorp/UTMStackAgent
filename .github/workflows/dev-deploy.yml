@@ -46,4 +46,6 @@ jobs:
 
     - name: Run Python script
       working-directory: ".github/scripts"
+      env:
+        GCP_KEY: ${{ secrets.GCP_KEY }}
       run: python deploy.py ${{ github.ref }}
