@@ -5,7 +5,6 @@ import requests
 import pytz
 from datetime import datetime
 from google.cloud import storage
-from dotenv import load_dotenv
 
 def main(update_version):
 	gcp_key = json.loads(os.environ.get("GCP_KEY"))
