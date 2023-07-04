@@ -8,8 +8,6 @@ from google.cloud import storage
 from dotenv import load_dotenv
 
 def main(update_version):
-	load_dotenv()
-
 	gcp_key = json.loads(os.environ.get("GCP_KEY"))
 
 	# os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r'utmstack-377415-dbe8b897390f.json'
