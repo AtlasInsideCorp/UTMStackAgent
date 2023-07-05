@@ -1,9 +1,9 @@
-name: Dev Deploy
+name: Alpha Deploy
 
 on:
   push:
     tags: 
-      - 'dev*'
+      - 'alpha*'
 
 jobs:
   build:
@@ -48,4 +48,4 @@ jobs:
       working-directory: ".github/scripts"
       env:
         GCP_KEY: ${{ secrets.GCP_KEY }}
-      run: python deploy.py dev-$(date +'%Y%m%d')
+      run: python deploy.py alpha-$(date +'%Y%m%d')

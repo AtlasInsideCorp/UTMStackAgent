@@ -1,9 +1,9 @@
-name: Dev Deploy
+name: Release Deploy
 
 on:
   push:
     tags: 
-      - 'dev*'
+      - 'v*'
 
 jobs:
   build:
@@ -48,4 +48,6 @@ jobs:
       working-directory: ".github/scripts"
       env:
         GCP_KEY: ${{ secrets.GCP_KEY }}
-      run: python deploy.py dev-$(date +'%Y%m%d')
+      run: |
+        TAG=$(echo $GITHUB_REF | sed 's/refs\/tags\///g')
+        python deploy.py $TAG
