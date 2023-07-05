@@ -48,4 +48,5 @@ jobs:
       working-directory: ".github/scripts"
       env:
         GCP_KEY: ${{ secrets.GCP_KEY }}
-      run: python deploy.py ${{ github.ref }}
+        TAG_NAME: ${{ github.ref.split('/')[-1] }}
+      run: python deploy.py $TAG_NAME
